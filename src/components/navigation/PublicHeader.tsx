@@ -41,8 +41,8 @@ export const PublicHeader: React.FC = () => {
     <header
       className={`sticky top-0 left-0 right-0 z-50 w-full backdrop-blur-md border-b transition-all duration-200 ${
         scrolled
-          ? 'bg-white/95 dark:bg-[#0B1118]/95 border-gray-200/90 dark:border-[rgba(160,180,195,0.18)] py-2.5 shadow-xs'
-          : 'bg-white/90 dark:bg-[#0B1118]/90 border-gray-200/70 dark:border-[rgba(160,180,195,0.14)] py-3'
+          ? 'bg-white/95 dark:bg-[#0B1118]/95 border-[#E9E7E5] dark:border-[rgba(160,180,195,0.18)] py-2.5 shadow-xs'
+          : 'bg-white/90 dark:bg-[#0B1118]/90 border-[#E9E7E5]/80 dark:border-[rgba(160,180,195,0.14)] py-3'
       }`}
     >
       <div className="max-w-7xl mx-auto px-6 h-12 flex items-center justify-between">
@@ -55,21 +55,21 @@ export const PublicHeader: React.FC = () => {
           }}
           className="flex items-center gap-3 group"
         >
-          <div className="w-8 h-8 rounded-lg bg-[#498ACF] flex items-center justify-center text-white shadow-sm transition-transform duration-300 group-hover:scale-105">
+          <div className="w-8 h-8 rounded-lg bg-[#478ED8] flex items-center justify-center text-white shadow-sm transition-transform duration-300 group-hover:scale-105">
             <Flame className="w-4 h-4 fill-white" />
           </div>
           <div className="flex flex-col">
-            <span className="text-[10px] tracking-wider text-[#498ACF] dark:text-[#36C5D9] uppercase font-mono font-bold leading-tight">
+            <span className="text-[10px] tracking-wider text-[#478ED8] dark:text-[#36C5D9] uppercase font-mono font-bold leading-tight">
               AETHERIX
             </span>
-            <span className="font-extrabold tracking-tight text-sm text-[#18191D] dark:text-[#F3F6F8] uppercase leading-tight">
+            <span className="font-extrabold tracking-tight text-sm text-[#191A1F] dark:text-[#F3F6F8] uppercase leading-tight">
               After The Fire
             </span>
           </div>
         </a>
 
         {/* Desktop Anchor Navigation Links */}
-        <nav className="hidden md:flex items-center space-x-1 lg:space-x-2 text-xs uppercase tracking-wider font-medium text-[#626873] dark:text-[#AAB5C2] bg-white/85 dark:bg-[#111C28]/90 backdrop-blur-md px-4 py-1.5 rounded-full border border-gray-200/80 dark:border-[rgba(160,180,195,0.18)] shadow-xs">
+        <nav className="hidden md:flex items-center space-x-1 lg:space-x-2 text-xs uppercase tracking-wider font-medium text-[#6B7280] dark:text-[#AAB5C2] bg-white/90 dark:bg-[#111C28]/90 backdrop-blur-md px-4 py-1.5 rounded-full border border-[#E9E7E5] dark:border-[rgba(160,180,195,0.18)] shadow-xs">
           {[
             { id: 'welcome', label: 'Welcome' },
             { id: 'about', label: 'About' },
@@ -82,8 +82,8 @@ export const PublicHeader: React.FC = () => {
               onClick={() => scrollTo(item.id)}
               className={`px-3 py-1.5 rounded-full transition-all duration-200 cursor-pointer ${
                 activeSection === item.id
-                  ? 'bg-[#18191D] dark:bg-[#36C5D9] text-white dark:text-[#0B1118] font-semibold shadow-xs'
-                  : 'text-[#626873] dark:text-[#AAB5C2] hover:text-[#18191D] dark:hover:text-[#F3F6F8] hover:bg-black/5 dark:hover:bg-white/5'
+                  ? 'bg-[#191A1F] dark:bg-[#36C5D9] text-white dark:text-[#0B1118] font-semibold shadow-xs'
+                  : 'text-[#6B7280] dark:text-[#AAB5C2] hover:text-[#191A1F] dark:hover:text-[#F3F6F8] hover:bg-black/5 dark:hover:bg-white/5'
               }`}
             >
               {item.label}
@@ -97,7 +97,7 @@ export const PublicHeader: React.FC = () => {
 
           <Link
             to="/dashboard/overview"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold bg-[#498ACF] text-white hover:bg-[#3572B0] transition-all shadow-sm active:scale-95 cursor-pointer"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold bg-[#478ED8] text-white hover:bg-[#357AC3] transition-all shadow-sm active:scale-95 cursor-pointer"
           >
             <span>Research Dashboard</span>
             <ArrowUpRight className="w-3.5 h-3.5" />
