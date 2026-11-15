@@ -12,7 +12,18 @@ export class MapService {
   static getCartoKey(): string | null {
     const key = import.meta.env.VITE_CARTO_BASEMAPS_KEY;
     if (!key || key.trim() === '') {
-      return 'cb1_59lw_1_bf2f028cb82f6408e71a608b';
+      return null;
+    }
+    return key.trim();
+  }
+
+  /**
+   * Retrieves the configured MapTiler API key from environment
+   */
+  static getMapTilerKey(): string | null {
+    const key = import.meta.env.VITE_MAPTILER_API_KEY;
+    if (!key || key.trim() === '') {
+      return null;
     }
     return key.trim();
   }
@@ -26,13 +37,48 @@ export class MapService {
 
   /**
    * Generates the MapLibre style specification.
-   * Defaults to universal OpenStreetMap provider (100% reliable, zero watermarks),
+   * Defaults to clean universal provider (zero watermarks),
    * with full support for both Light Theme and Dark Theme (Midnight Geospatial).
    */
   static getMapStyle(provider: BasemapProvider = 'osm', isDark: boolean = true): maplibregl.StyleSpecification {
     const bgColor = isDark ? MAP_THEME.basemap.backgroundColor : '#F3F6F8';
+    const mapTilerKey = this.getMapTilerKey();
 
-    // 1. OpenStreetMap Provider (Clean, zero watermarks, 100% reliable)
+    // 1. If MapTiler key is configured, use official MapTiler vector or raster style
+    if (mapTilerKey) {
+      const styleId = isDark ? 'ch-swisstopo-lbm-dark' : 'outdoor-v2';
+      return {
+        version: 8,
+        sources: {
+          'maptiler-tiles': {
+            type: 'raster',
+            tiles: [
+              `https://api.maptiler.com/maps/${styleId}/256/{z}/{x}/{y}.png?key=${encodeURIComponent(mapTilerKey)}`,
+            ],
+            tileSize: 256,
+            attribution: '© MapTiler · © OpenStreetMap contributors',
+          },
+        },
+        layers: [
+          {
+            id: 'background',
+            type: 'background',
+            paint: {
+              'background-color': bgColor,
+            },
+          },
+          {
+            id: 'maptiler-layer',
+            type: 'raster',
+            source: 'maptiler-tiles',
+            minzoom: 0,
+            maxzoom: 19,
+          },
+        ],
+      };
+    }
+
+    // 2. OpenStreetMap Provider (Clean, zero watermarks, 100% reliable)
     if (provider === 'osm') {
       return {
         version: 8,
@@ -43,7 +89,7 @@ export class MapService {
               'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
             ],
             tileSize: 256,
-            attribution: '© OpenStreetMap contributors · Awaiting MapTiler API Key in .env.local',
+            attribution: '© OpenStreetMap contributors',
           },
         },
         layers: [
@@ -76,10 +122,11 @@ export class MapService {
       };
     }
 
-    // 2. CARTO Provider (Optional secondary basemap)
+    // 3. CARTO Provider (Clean Dark Matter / Voyager)
     const cartoKey = this.getCartoKey();
     const tilePath = isDark ? 'rastertiles/dark_all' : 'rastertiles/voyager';
-    const tileUrl = cartoKey
+    // Only append api_key if it's a full key length (>= 24 chars), avoiding partial keys triggering watermarks
+    const tileUrl = cartoKey && cartoKey.length >= 24
       ? `https://a.basemaps.cartocdn.com/${tilePath}/{z}/{x}/{y}@2x.png?api_key=${encodeURIComponent(cartoKey)}`
       : `https://a.basemaps.cartocdn.com/${tilePath}/{z}/{x}/{y}@2x.png`;
 
