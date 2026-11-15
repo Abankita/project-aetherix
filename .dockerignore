@@ -1,0 +1,11 @@
+node_modules
+dist
+dist-ssr
+.env.local
+.env.*.local
+extracted/
+.git
+.gitignore
+*.log
+*.md
+.DS_Store

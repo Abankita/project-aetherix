@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <rect width="64" height="64" rx="16" fill="#0D121D"/>
+  <path d="M32 12C28 22 18 28 18 38C18 46 24 52 32 52C40 52 46 46 46 38C46 28 36 22 32 12Z" fill="url(#fire_grad)"/>
+  <path d="M32 26C30 32 24 36 24 41C24 45.4 27.6 49 32 49C36.4 49 40 45.4 40 41C40 36 34 32 32 26Z" fill="#FFA500"/>
+  <circle cx="32" cy="42" r="3" fill="#FFFFFF"/>
+  <circle cx="32" cy="32" r="20" stroke="#22B8C7" stroke-width="2" stroke-dasharray="4 4" opacity="0.6"/>
+  <defs>
+    <linearGradient id="fire_grad" x1="18" y1="12" x2="46" y2="52" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F28C45"/>
+      <stop offset="1" stop-color="#E85D63"/>
+    </linearGradient>
+  </defs>
+</svg>
