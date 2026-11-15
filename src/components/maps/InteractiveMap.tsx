@@ -192,8 +192,8 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
       style: initialStyle,
       center: center,
       zoom: zoom,
-      maxZoom: 16,
-      minZoom: 7,
+      maxZoom: 18,
+      minZoom: 2, // Allow zooming out freely across California and coastal region
       interactive: interactive,
       attributionControl: false,
     });
@@ -368,19 +368,19 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
           <button
             onClick={toggleProvider}
             type="button"
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-mono font-medium backdrop-blur-md bg-[#121418]/85 text-white border border-white/20 hover:bg-[#121418] shadow-sm transition-all cursor-pointer"
+            className="flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-mono font-medium backdrop-blur-md bg-white/95 text-[#18191D] border border-gray-200/90 hover:bg-gray-50 shadow-sm dark:bg-[#121418]/90 dark:text-white dark:border-white/20 dark:hover:bg-[#121418] transition-all cursor-pointer"
             title="Toggle between MapTiler / OpenStreetMap Basemaps"
           >
             <Layers className="w-3.5 h-3.5 text-[#29C9D2] pointer-events-none" />
-            <span className="pointer-events-none uppercase text-[11px] tracking-wider">
-              MAPTILER HYBRID · MONTEREY COUNTY, CA
+            <span className="pointer-events-none uppercase text-[11px] tracking-wider font-semibold">
+              BIG SUR STUDY AREA · MONTEREY COUNTY, CA
             </span>
           </button>
 
           <button
             onClick={resetView}
             type="button"
-            className="p-1.5 rounded-full bg-[#121418]/85 text-white hover:bg-[#121418] border border-white/20 shadow-sm transition-all cursor-pointer"
+            className="p-1.5 rounded-full backdrop-blur-md bg-white/95 text-[#18191D] hover:bg-gray-50 border border-gray-200/90 shadow-sm dark:bg-[#121418]/90 dark:text-white dark:hover:bg-[#121418] dark:border-white/20 transition-all cursor-pointer"
             title="Reset to Big Sur AOI"
           >
             <RotateCcw className="w-3.5 h-3.5 pointer-events-none text-[#29C9D2]" />
@@ -389,25 +389,25 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
       )}
 
       {/* Top Right: Map Provider Status Callout */}
-      <div className="absolute top-4 right-14 z-10 hidden sm:flex items-center gap-1.5 bg-[#121418]/85 backdrop-blur-md px-3 py-1 rounded-full border border-amber-400/30 text-[10px] font-mono text-amber-200 pointer-events-none">
-        <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+      <div className="absolute top-4 right-14 z-10 hidden sm:flex items-center gap-1.5 bg-amber-50/95 dark:bg-[#121418]/85 backdrop-blur-md px-3 py-1 rounded-full border border-amber-300 dark:border-amber-400/30 text-[10px] font-mono text-amber-900 dark:text-amber-200 pointer-events-none shadow-xs">
+        <span className="w-1.5 h-1.5 rounded-full bg-amber-500 dark:bg-amber-400 animate-pulse"></span>
         <span>Awaiting MapTiler API Key in .env.local</span>
       </div>
 
       {/* Bottom Left: Exact Legend Pill from reference screenshot */}
-      <div className="absolute bottom-4 left-4 z-10 flex flex-wrap items-center gap-2.5 bg-[#121418]/90 backdrop-blur-md px-3.5 py-1.5 rounded-xl border border-white/20 text-[11px] font-mono text-white shadow-lg pointer-events-auto">
+      <div className="absolute bottom-4 left-4 z-10 flex flex-wrap items-center gap-2.5 bg-white/95 dark:bg-[#121418]/90 backdrop-blur-md px-3.5 py-1.5 rounded-xl border border-gray-200/90 dark:border-white/20 text-[11px] font-mono text-[#18191D] dark:text-white shadow-md pointer-events-auto">
         <div className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded bg-[#F49A48] border border-white/40"></span>
+          <span className="w-2.5 h-2.5 rounded bg-[#F49A48] border border-amber-600/30 dark:border-white/40"></span>
           <span>Timber Fire (Orange)</span>
         </div>
-        <span className="text-gray-500">·</span>
+        <span className="text-gray-300 dark:text-gray-600">·</span>
         <div className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded bg-[#F06470] border border-white/40"></span>
+          <span className="w-2.5 h-2.5 rounded bg-[#F06470] border border-rose-600/30 dark:border-white/40"></span>
           <span>Plaskett Fire (Red)</span>
         </div>
-        <span className="text-gray-500">·</span>
+        <span className="text-gray-300 dark:text-gray-600">·</span>
         <div className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded bg-[#29C9D2] border border-white/40"></span>
+          <span className="w-2.5 h-2.5 rounded bg-[#29C9D2] border border-teal-600/30 dark:border-white/40"></span>
           <span>HUC-12 Basins (Cyan)</span>
         </div>
       </div>

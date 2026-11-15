@@ -31,19 +31,18 @@ export const PublicPage: React.FC = () => {
   return (
     <div className="w-full">
       {/* ========================================================= */}
-      {/* SECTION 1: WELCOME / HERO (REAL GEOSPATIAL MAP HERO)      */}
+      {/* SECTION 1: WELCOME / HERO (FULL HEADING & CLEAN TOP)      */}
       {/* ========================================================= */}
       <section
         id="welcome"
-        className="relative pt-32 pb-20 md:pt-36 md:pb-28 px-4 sm:px-6 lg:px-8 overflow-hidden border-b border-gray-200/80 bg-white dark:bg-[#0B1118] dark:border-[rgba(160,180,195,0.14)] transition-colors"
+        className="relative pt-8 pb-16 md:pt-12 md:pb-24 px-4 sm:px-6 lg:px-8 overflow-hidden border-b border-gray-200/80 bg-white dark:bg-[#0B1118] dark:border-[rgba(160,180,195,0.14)] transition-colors"
       >
-        <div className="max-w-7xl mx-auto space-y-10">
+        <div className="max-w-7xl mx-auto space-y-8">
           {/* Editorial Header */}
-          <div className="max-w-3xl">
-            <h1 className="text-5xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-[#18191D] dark:text-[#F3F6F8] leading-[1.05] mb-6">
-              what changed.
+          <div className="max-w-4xl">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-[#18191D] dark:text-[#F3F6F8] leading-[1.12] mb-6">
+              After the fire, understand what changed.
             </h1>
-            <span className="sr-only">After the fire, understand what changed.</span>
 
             <p className="text-lg md:text-xl text-[#626873] dark:text-[#AAB5C2] leading-relaxed font-normal mb-8 max-w-2xl">
               An interactive research initiative combining satellite intelligence and watershed
@@ -74,46 +73,46 @@ export const PublicPage: React.FC = () => {
           <div className="relative rounded-3xl overflow-hidden border border-gray-200/80 dark:border-[rgba(160,180,195,0.2)] shadow-xl bg-white dark:bg-[#090D14]">
             {/* Real MapLibre GL instance displaying Big Sur AOI and Perimeters */}
             <InteractiveMap
-              height="580px"
+              height="480px"
               showFires={true}
               showWatersheds={true}
               defaultView="hybrid"
               interactive={true}
             />
 
-            {/* Bottom Preliminary Processing Inventory Strip */}
-            <div className="bg-[#121418] px-6 py-4 border-t border-gray-800 grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs font-mono text-gray-300">
+            {/* Bottom Preliminary Processing Inventory Strip (Adaptive Light / Dark) */}
+            <div className="bg-[#F8F9FA] dark:bg-[#121418] px-6 py-4 border-t border-gray-200 dark:border-gray-800 grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs font-mono text-[#18191D] dark:text-gray-300 transition-colors">
               <div className="flex items-center gap-3">
-                <div className="w-2 h-2 rounded-full bg-[#22B8C7]"></div>
+                <div className="w-2.5 h-2.5 rounded-full bg-[#22B8C7]"></div>
                 <div>
-                  <span className="text-gray-400 block text-[10px] uppercase font-semibold">
+                  <span className="text-[#626873] dark:text-gray-400 block text-[10px] uppercase font-semibold">
                     Preliminary Catchments
                   </span>
-                  <span className="text-white font-bold text-sm">
+                  <span className="text-[#18191D] dark:text-white font-bold text-sm">
                     {inventory.huc12Units} HUC-12 Watershed Units
                   </span>
                 </div>
               </div>
 
               <div className="flex items-center gap-3">
-                <div className="w-2 h-2 rounded-full bg-[#498ACF]"></div>
+                <div className="w-2.5 h-2.5 rounded-full bg-[#498ACF]"></div>
                 <div>
-                  <span className="text-gray-400 block text-[10px] uppercase font-semibold">
+                  <span className="text-[#626873] dark:text-gray-400 block text-[10px] uppercase font-semibold">
                     Pre-Fire Observation Scenes
                   </span>
-                  <span className="text-white font-bold text-sm">
+                  <span className="text-[#18191D] dark:text-white font-bold text-sm">
                     {inventory.preFireScenes} Pre-Fire Sentinel-2 Scenes
                   </span>
                 </div>
               </div>
 
               <div className="flex items-center gap-3">
-                <div className="w-2 h-2 rounded-full bg-[#F28C45]"></div>
+                <div className="w-2.5 h-2.5 rounded-full bg-[#F28C45]"></div>
                 <div>
-                  <span className="text-gray-400 block text-[10px] uppercase font-semibold">
+                  <span className="text-[#626873] dark:text-gray-400 block text-[10px] uppercase font-semibold">
                     Post-Fire Observation Scenes
                   </span>
-                  <span className="text-white font-bold text-sm">
+                  <span className="text-[#18191D] dark:text-white font-bold text-sm">
                     {inventory.postFireScenes} Post-Fire Sentinel-2 Scenes
                   </span>
                 </div>
@@ -358,11 +357,41 @@ export const PublicPage: React.FC = () => {
       {/* ========================================================= */}
       {/* SECTION 4: MEET THE TEAM (EXACTLY TWO PROFILES)           */}
       {/* ========================================================= */}
-      <section id="team" className="py-16 md:py-20 px-4 sm:px-6 lg:px-8 bg-white dark:bg-[#0B1118] border-b border-gray-200 dark:border-[rgba(160,180,195,0.14)] transition-colors">
-        <div className="max-w-4xl mx-auto">
+      <section
+        id="team"
+        className="relative py-20 md:py-24 px-4 sm:px-6 lg:px-8 bg-[#F8F7F4] dark:bg-[#0B1118] border-b border-gray-200 dark:border-[rgba(160,180,195,0.14)] transition-colors overflow-hidden"
+      >
+        {/* Subtle Geospatial / Topographic Contour Background Motif */}
+        <div className="absolute inset-0 pointer-events-none select-none overflow-hidden" aria-hidden="true">
+          {/* Topographic Contours SVG Pattern */}
+          <svg
+            className="absolute w-full h-full text-[#C87D55] dark:text-[#D98A60] opacity-[0.04] dark:opacity-[0.05]"
+            viewBox="0 0 1200 600"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            preserveAspectRatio="none"
+          >
+            <path d="M-100 120 C 200 80, 450 180, 700 130 C 950 80, 1100 160, 1300 110" stroke="currentColor" strokeWidth="1.2" />
+            <path d="M-100 190 C 180 150, 420 250, 680 200 C 940 150, 1120 230, 1300 180" stroke="currentColor" strokeWidth="1.2" />
+            <path d="M-100 260 C 220 210, 480 320, 720 270 C 960 220, 1140 300, 1300 250" stroke="currentColor" strokeWidth="1.2" />
+            <path d="M-100 330 C 190 280, 440 390, 710 340 C 980 290, 1150 370, 1300 320" stroke="currentColor" strokeWidth="1.2" />
+            <path d="M-100 400 C 230 350, 470 460, 740 410 C 1000 360, 1170 440, 1300 390" stroke="currentColor" strokeWidth="1.2" />
+            <path d="M-100 470 C 200 420, 460 530, 730 480 C 990 430, 1160 510, 1300 460" stroke="currentColor" strokeWidth="1.2" />
+          </svg>
+
+          {/* Restrained Geographic Grid Details */}
+          <div className="absolute top-6 left-8 font-mono text-[10px] tracking-widest text-[#C87D55]/30 dark:text-[#D98A60]/30 hidden sm:block">
+            + 36.27° N · 100m CONTOURS
+          </div>
+          <div className="absolute bottom-6 right-8 font-mono text-[10px] tracking-widest text-[#C87D55]/30 dark:text-[#D98A60]/30 hidden sm:block">
+            + 121.81° W · EPSG:32610
+          </div>
+        </div>
+
+        <div className="relative max-w-5xl mx-auto">
           {/* Refined Heading */}
-          <div className="text-center max-w-xl mx-auto mb-12">
-            <div className="text-xs uppercase font-mono tracking-widest text-[#C87D55] dark:text-[#D98A60] font-semibold mb-2">
+          <div className="text-center max-w-xl mx-auto mb-14">
+            <div className="text-xs uppercase font-mono tracking-widest text-[#C87D55] dark:text-[#D98A60] font-semibold mb-2.5">
               AETHERIX · PROJECT TEAM
             </div>
             <h2 className="text-3xl sm:text-4xl md:text-[46px] font-medium tracking-tight text-[#18191D] dark:text-[#F3F6F8] mb-3 leading-tight">
@@ -373,28 +402,48 @@ export const PublicPage: React.FC = () => {
             </p>
           </div>
 
-          {/* EXACTLY TWO PROFILES — Minimal Obsidian Copper Panels */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
-            {TEAM_MEMBERS.map((member) => (
+          {/* EXACTLY TWO PROFILES — Balanced Two-Column Panels */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 max-w-4xl mx-auto">
+            {TEAM_MEMBERS.map((member, idx) => (
               <div
                 key={member.name}
-                className="p-8 rounded-2xl bg-[#FAF9F6] dark:bg-[#111C28] border border-[#E8E6E1] dark:border-[rgba(160,180,195,0.14)] flex flex-col justify-between hover:border-[#C87D55]/50 dark:hover:border-[#D98A60]/50 transition-all shadow-2xs group"
+                className="relative overflow-hidden p-8 sm:p-9 rounded-2xl bg-white/90 dark:bg-[#111C28]/95 border border-[#E8E6E1] dark:border-[rgba(160,180,195,0.14)] flex flex-col justify-between hover:border-[#C87D55]/60 dark:hover:border-[#D98A60]/60 transition-all shadow-xs group backdrop-blur-xs"
               >
-                <div>
-                  <div className="text-[10px] font-mono uppercase tracking-widest text-[#858B95] dark:text-[#788796] mb-3">
-                    AETHERIX RESEARCH
+                {/* Background Watermark Insignia/Logo */}
+                <div
+                  className="absolute -right-6 -bottom-6 w-44 h-44 pointer-events-none select-none text-[#C87D55]/[0.08] dark:text-[#D98A60]/[0.09] transition-transform duration-500 group-hover:scale-105"
+                  aria-hidden="true"
+                >
+                  <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-full h-full">
+                    <circle cx="50" cy="50" r="44" strokeDasharray="3 3" />
+                    <circle cx="50" cy="50" r="32" />
+                    <circle cx="50" cy="50" r="18" />
+                    <line x1="50" y1="2" x2="50" y2="98" strokeDasharray="2 2" />
+                    <line x1="2" y1="50" x2="98" y2="50" strokeDasharray="2 2" />
+                    <polygon points="50,22 58,42 78,50 58,58 50,78 42,58 22,50 42,42" fill="currentColor" fillOpacity="0.15" />
+                  </svg>
+                </div>
+
+                <div className="relative z-10">
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="text-[11px] font-mono uppercase tracking-widest text-[#858B95] dark:text-[#788796]">
+                      AETHERIX RESEARCH
+                    </span>
+                    <span className="text-xs font-mono font-bold text-[#C87D55] dark:text-[#D98A60]">
+                      0{idx + 1}
+                    </span>
                   </div>
-                  <h3 className="text-2xl sm:text-[28px] font-medium tracking-tight text-[#18191D] dark:text-[#F3F6F8]">
+                  <h3 className="text-2xl sm:text-[26px] font-medium tracking-tight text-[#18191D] dark:text-[#F3F6F8] leading-snug">
                     {member.name}
                   </h3>
                 </div>
 
                 {/* Subtle Icon & Label Links */}
-                <div className="flex items-center gap-5 mt-8 pt-5 border-t border-[#E8E6E1] dark:border-[rgba(160,180,195,0.12)]">
+                <div className="relative z-10 flex items-center gap-6 mt-8 pt-5 border-t border-[#E8E6E1] dark:border-[rgba(160,180,195,0.12)]">
                   {member.email ? (
                     <a
                       href={`mailto:${member.email}`}
-                      className="inline-flex items-center gap-2 text-xs font-mono text-[#18191D] dark:text-[#F3F6F8] hover:text-[#C87D55] dark:hover:text-[#D98A60] transition-colors cursor-pointer"
+                      className="inline-flex items-center gap-2 text-xs font-mono text-[#18191D] dark:text-[#F3F6F8] hover:text-[#C87D55] dark:hover:text-[#D98A60] transition-colors cursor-pointer py-1"
                       aria-label={`Email ${member.name}`}
                     >
                       <Mail className="w-4 h-4 text-[#858B95] dark:text-[#788796] group-hover:text-[#C87D55] dark:group-hover:text-[#D98A60] transition-colors" />
@@ -404,7 +453,7 @@ export const PublicPage: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => scrollTo('contact')}
-                      className="inline-flex items-center gap-2 text-xs font-mono text-[#18191D] dark:text-[#F3F6F8] hover:text-[#C87D55] dark:hover:text-[#D98A60] transition-colors cursor-pointer"
+                      className="inline-flex items-center gap-2 text-xs font-mono text-[#18191D] dark:text-[#F3F6F8] hover:text-[#C87D55] dark:hover:text-[#D98A60] transition-colors cursor-pointer py-1"
                       title={`Inquire with ${member.name} via Contact section`}
                       aria-label={`Contact ${member.name}`}
                     >
@@ -420,7 +469,7 @@ export const PublicPage: React.FC = () => {
                       href={member.linkedinUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 text-xs font-mono text-[#18191D] dark:text-[#F3F6F8] hover:text-[#C87D55] dark:hover:text-[#D98A60] transition-colors cursor-pointer"
+                      className="inline-flex items-center gap-2 text-xs font-mono text-[#18191D] dark:text-[#F3F6F8] hover:text-[#C87D55] dark:hover:text-[#D98A60] transition-colors cursor-pointer py-1"
                       aria-label={`LinkedIn ${member.name}`}
                     >
                       <Linkedin className="w-4 h-4 text-[#858B95] dark:text-[#788796] group-hover:text-[#C87D55] dark:group-hover:text-[#D98A60] transition-colors" />
@@ -430,7 +479,7 @@ export const PublicPage: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => scrollTo('contact')}
-                      className="inline-flex items-center gap-2 text-xs font-mono text-[#18191D] dark:text-[#F3F6F8] hover:text-[#C87D55] dark:hover:text-[#D98A60] transition-colors cursor-pointer"
+                      className="inline-flex items-center gap-2 text-xs font-mono text-[#18191D] dark:text-[#F3F6F8] hover:text-[#C87D55] dark:hover:text-[#D98A60] transition-colors cursor-pointer py-1"
                       title={`${member.name} · AETHERIX Research Consortium Profile`}
                       aria-label={`LinkedIn profile for ${member.name}`}
                     >
