@@ -12,12 +12,12 @@ export interface TeamMember {
 export const TEAM_MEMBERS: TeamMember[] = [
   {
     name: 'Rajesh Kumar Swain',
-    email: null, // Configure when supplied (e.g. 'rajesh@example.com')
-    linkedinUrl: null, // Configure when supplied (e.g. 'https://www.linkedin.com/in/...')
+    email: 'rajeshkumarswain1976@gmail.com',
+    linkedinUrl: 'https://www.linkedin.com/in/rajesh-kumar-swain-71243raj/',
   },
   {
     name: 'Abankita Behera',
-    email: null, // Configure when supplied
-    linkedinUrl: null, // Configure when supplied
+    email: 'abankitabehera05@gmail.com',
+    linkedinUrl: 'https://www.linkedin.com/in/abankita-behera-210836227/',
   },
 ];
