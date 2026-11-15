@@ -430,12 +430,15 @@ Do not report a test as passed unless it has actually been run.
 
 ## Team
 
-**AETHERIX**
+### TEAM AETHERIX
 
-- Rajesh Kumar Swain
-- Abankita Behera
+- **RAJESH KUMAR SWAIN**
+  - **Email:** [rajeshkumarswain1976@gmail.com](mailto:rajeshkumarswain1976@gmail.com)
+  - **LinkedIn:** [https://www.linkedin.com/in/rajesh-kumar-swain-71243raj/](https://www.linkedin.com/in/rajesh-kumar-swain-71243raj/)
 
-Member contact details should be added only when the correct email addresses and LinkedIn profile URLs have been confirmed.
+- **ABANKITA BEHERA**
+  - **Email:** [abankitabehera05@gmail.com](mailto:abankitabehera05@gmail.com)
+  - **LinkedIn:** [https://www.linkedin.com/in/abankita-behera-210836227/](https://www.linkedin.com/in/abankita-behera-210836227/)
 
 ---
 
