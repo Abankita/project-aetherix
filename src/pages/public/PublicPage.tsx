@@ -11,6 +11,7 @@ import {
   Linkedin,
   RotateCcw,
   CheckCircle,
+  Info,
 } from 'lucide-react';
 import { InteractiveMap } from '@/components/maps/InteractiveMap';
 import { ContactForm } from '@/components/forms/ContactForm';
@@ -30,58 +31,48 @@ export const PublicPage: React.FC = () => {
   return (
     <div className="w-full relative overflow-hidden bg-[#FAF7F5] dark:bg-[#0B1118] transition-colors">
       {/* ========================================================= */}
-      {/* ATMOSPHERIC BACKGROUND: SANTA LUCIA COASTAL RIDGE SILHOUETTES */}
+      {/* ATMOSPHERIC BACKGROUND: BIG SUR COASTAL PANORAMA FLANKS   */}
       {/* ========================================================= */}
       <div
-        className="absolute inset-0 pointer-events-none select-none overflow-hidden z-0"
+        className="absolute inset-0 pointer-events-none select-none z-0 overflow-hidden"
         aria-hidden="true"
       >
-        {/* Soft atmospheric gradient washes */}
-        <div className="absolute top-0 left-0 right-0 h-[800px] bg-gradient-to-b from-[#F5EFEA]/60 via-[#FAF7F5]/40 to-transparent dark:from-[#111C28]/40 dark:via-[#0B1118]/20 dark:to-transparent" />
-        <div className="absolute top-[800px] left-0 right-0 h-[1200px] bg-gradient-to-b from-transparent via-[#F7F5F8]/50 to-[#FAF7F5]/60 dark:from-transparent dark:via-[#111C28]/20 dark:to-[#0B1118]/40" />
-        <div className="absolute top-[2000px] left-0 right-0 bottom-0 bg-gradient-to-b from-[#FAF7F5]/60 via-[#F5EFEA]/40 to-[#FAF7F5] dark:from-[#0B1118] dark:via-[#111C28]/30 dark:to-[#0B1118]" />
+        {/* Full-Height Left Coastline Flank (Ocean Cliffs, Sea Surf & Mountain Slopes) */}
+        <div className="absolute top-0 bottom-0 left-0 w-44 sm:w-60 md:w-72 lg:w-80 xl:w-96 2xl:w-[420px] overflow-hidden">
+          <div
+            className="w-full h-full bg-cover bg-left bg-repeat-y opacity-90 dark:opacity-30 transition-opacity"
+            style={{
+              backgroundImage: "url('/left-flank.jpg')",
+              backgroundSize: '100% auto',
+            }}
+          />
+          {/* Inner Edge Feathering into Warm Center */}
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#FAF7F5]/40 to-[#FAF7F5] dark:from-transparent dark:via-[#0B1118]/50 dark:to-[#0B1118]" />
+        </div>
 
-        {/* Santa Lucia Mountain Ridges Decorative SVG Vector */}
-        <svg
-          className="absolute top-0 left-0 w-full h-[1400px] text-[#C49B80] dark:text-[#5B758F] opacity-[0.07] dark:opacity-[0.06]"
-          viewBox="0 0 1440 900"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          preserveAspectRatio="none"
-        >
-          {/* Distant Ridge */}
-          <path
-            d="M0,280 C240,240 400,290 600,260 C800,230 960,280 1200,250 C1320,235 1380,245 1440,240 L1440,900 L0,900 Z"
-            fill="currentColor"
-            fillOpacity="0.4"
+        {/* Full-Height Right Mountain Flank (Golden Santa Lucia Ridges & Misty Peaks) */}
+        <div className="absolute top-0 bottom-0 right-0 w-44 sm:w-60 md:w-72 lg:w-80 xl:w-96 2xl:w-[420px] overflow-hidden">
+          <div
+            className="w-full h-full bg-cover bg-right bg-repeat-y opacity-90 dark:opacity-30 transition-opacity"
+            style={{
+              backgroundImage: "url('/right-flank.jpg')",
+              backgroundSize: '100% auto',
+            }}
           />
-          {/* Mid Ridge */}
-          <path
-            d="M0,380 C180,340 360,400 580,360 C800,320 1020,390 1240,350 C1340,330 1400,345 1440,340 L1440,900 L0,900 Z"
-            fill="currentColor"
-            fillOpacity="0.6"
-          />
-          {/* Near Coastal Escarpment */}
-          <path
-            d="M0,520 C220,480 440,540 720,490 C1000,440 1200,530 1440,480 L1440,900 L0,900 Z"
-            fill="currentColor"
-            fillOpacity="0.8"
-          />
-        </svg>
+          {/* Inner Edge Feathering into Warm Center */}
+          <div className="absolute inset-0 bg-gradient-to-l from-transparent via-[#FAF7F5]/40 to-[#FAF7F5] dark:from-transparent dark:via-[#0B1118]/50 dark:to-[#0B1118]" />
+        </div>
 
-        {/* Lower Elevation Coastal Topographic Contours for Team & Contact */}
-        <svg
-          className="absolute top-[2100px] left-0 w-full h-[1200px] text-[#D8895B] dark:text-[#478ED8] opacity-[0.04] dark:opacity-[0.05]"
-          viewBox="0 0 1440 800"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          preserveAspectRatio="none"
-        >
-          <path d="M-100 180 C 200 130, 480 240, 780 180 C 1080 120, 1260 220, 1540 170" stroke="currentColor" strokeWidth="1.5" />
-          <path d="M-100 270 C 240 220, 520 330, 820 270 C 1120 210, 1300 310, 1540 260" stroke="currentColor" strokeWidth="1.5" />
-          <path d="M-100 360 C 210 310, 490 420, 790 360 C 1090 300, 1270 400, 1540 350" stroke="currentColor" strokeWidth="1.5" />
-          <path d="M-100 450 C 250 400, 530 510, 830 450 C 1130 390, 1310 490, 1540 440" stroke="currentColor" strokeWidth="1.5" />
-        </svg>
+        {/* Hero Upper Atmosphere Panoramic Wash */}
+        <div className="absolute top-0 left-0 right-0 h-[650px] overflow-hidden">
+          <div
+            className="w-full h-full bg-cover bg-top sm:bg-center opacity-30 dark:opacity-15"
+            style={{
+              backgroundImage: "url('/big-sur-bg.jpg')",
+            }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#FAF7F5]/20 via-[#FAF7F5]/60 to-[#FAF7F5] dark:from-[#0B1118]/30 dark:via-[#0B1118]/70 dark:to-[#0B1118]" />
+        </div>
       </div>
 
       <div className="relative z-10 w-full">
@@ -218,6 +209,22 @@ export const PublicPage: React.FC = () => {
                       </div>
                     </div>
                   </div>
+                </div>
+
+                {/* Operational Inventory Notice Banner */}
+                <div className="p-3.5 rounded-xl bg-blue-50/70 dark:bg-[#111C28] border border-blue-200/80 dark:border-[rgba(160,180,195,0.18)] text-xs font-mono text-[#065EA1] dark:text-[#AAB5C2] flex items-center justify-between gap-4 mt-4">
+                  <div className="flex items-center gap-2">
+                    <Info className="w-4 h-4 shrink-0 text-[#478ED8] dark:text-[#36C5D9]" />
+                    <span>
+                      <strong>Operational Inventory Notice:</strong> Preliminary processing inventory metrics shown. Vector boundaries displayed from actual project GeoJSON (EPSG:32610 UTM Zone 10N).
+                    </span>
+                  </div>
+                  <Link
+                    to="/dashboard/overview"
+                    className="text-[#478ED8] dark:text-[#36C5D9] hover:text-blue-900 dark:hover:text-cyan-300 font-bold underline shrink-0 cursor-pointer"
+                  >
+                    Open Console →
+                  </Link>
                 </div>
               </div>
             </div>
@@ -484,8 +491,31 @@ export const PublicPage: React.FC = () => {
         {/* ========================================================= */}
         <section
           id="team"
-          className="relative py-20 md:py-28 px-4 sm:px-6 lg:px-8 border-b border-[#E9E7E5] dark:border-[rgba(160,180,195,0.14)]"
+          className="relative py-20 md:py-28 px-4 sm:px-6 lg:px-8 border-b border-[#E9E7E5] dark:border-[rgba(160,180,195,0.14)] overflow-hidden"
         >
+          {/* Subtle Geospatial / Topographic Contour Background Motif */}
+          <div className="absolute inset-0 pointer-events-none select-none overflow-hidden" aria-hidden="true">
+            <svg
+              className="absolute w-full h-full text-[#D8895B] opacity-[0.05] dark:opacity-[0.06]"
+              viewBox="0 0 1200 600"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              preserveAspectRatio="none"
+            >
+              <path d="M-100 120 C 200 80, 450 180, 700 130 C 950 80, 1100 160, 1300 110" stroke="currentColor" strokeWidth="1.2" />
+              <path d="M-100 190 C 180 150, 420 250, 680 200 C 940 150, 1120 230, 1300 180" stroke="currentColor" strokeWidth="1.2" />
+              <path d="M-100 260 C 220 210, 480 320, 720 270 C 960 220, 1140 300, 1300 250" stroke="currentColor" strokeWidth="1.2" />
+              <path d="M-100 330 C 190 280, 440 390, 710 340 C 980 290, 1150 370, 1300 320" stroke="currentColor" strokeWidth="1.2" />
+              <path d="M-100 400 C 230 350, 470 460, 740 410 C 1000 360, 1170 440, 1300 390" stroke="currentColor" strokeWidth="1.2" />
+            </svg>
+            <div className="absolute top-6 left-8 font-mono text-[10px] tracking-widest text-[#D8895B]/30 hidden sm:block">
+              + 36.27° N · 100m CONTOURS
+            </div>
+            <div className="absolute bottom-6 right-8 font-mono text-[10px] tracking-widest text-[#D8895B]/30 hidden sm:block">
+              + 121.81° W · EPSG:32610
+            </div>
+          </div>
+
           <div className="relative max-w-5xl mx-auto">
             {/* Heading */}
             <div className="text-center max-w-xl mx-auto mb-12">
@@ -505,9 +535,24 @@ export const PublicPage: React.FC = () => {
               {TEAM_MEMBERS.map((member, idx) => (
                 <div
                   key={member.name}
-                  className="relative p-7 sm:p-8 rounded-2xl bg-white dark:bg-[#111C28] border border-[#E9E7E5] dark:border-[rgba(160,180,195,0.14)] flex flex-col justify-between hover:border-[#D8895B]/50 transition-all shadow-xs group"
+                  className="relative overflow-hidden p-7 sm:p-8 rounded-2xl bg-white/95 dark:bg-[#111C28]/95 backdrop-blur-xs border border-[#E9E7E5] dark:border-[rgba(160,180,195,0.14)] flex flex-col justify-between hover:border-[#D8895B]/50 transition-all shadow-xs group"
                 >
-                  <div>
+                  {/* Subtle Background Watermark Insignia/Logo */}
+                  <div
+                    className="absolute -right-6 -bottom-6 w-44 h-44 pointer-events-none select-none text-[#D8895B]/[0.08] dark:text-[#D98A60]/[0.09] transition-transform duration-500 group-hover:scale-105"
+                    aria-hidden="true"
+                  >
+                    <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-full h-full">
+                      <circle cx="50" cy="50" r="44" strokeDasharray="3 3" />
+                      <circle cx="50" cy="50" r="32" />
+                      <circle cx="50" cy="50" r="18" />
+                      <line x1="50" y1="2" x2="50" y2="98" strokeDasharray="2 2" />
+                      <line x1="2" y1="50" x2="98" y2="50" strokeDasharray="2 2" />
+                      <polygon points="50,22 58,42 78,50 58,58 50,78 42,58 22,50 42,42" fill="currentColor" fillOpacity="0.15" />
+                    </svg>
+                  </div>
+
+                  <div className="relative z-10">
                     <div className="flex items-center justify-between mb-4">
                       <span className="text-[11px] font-mono uppercase tracking-widest text-[#6B7280] dark:text-[#788796]">
                         AETHERIX RESEARCH
@@ -522,7 +567,7 @@ export const PublicPage: React.FC = () => {
                   </div>
 
                   {/* Icon & Label Links */}
-                  <div className="flex items-center gap-6 mt-8 pt-5 border-t border-[#E9E7E5] dark:border-[rgba(160,180,195,0.12)]">
+                  <div className="relative z-10 flex items-center gap-6 mt-8 pt-5 border-t border-[#E9E7E5] dark:border-[rgba(160,180,195,0.12)]">
                     {member.email && (
                       <a
                         href={`mailto:${member.email}`}
