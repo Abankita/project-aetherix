@@ -29,50 +29,28 @@ export const PublicPage: React.FC = () => {
   };
 
   return (
-    <div className="w-full relative overflow-hidden bg-[#FAF7F5] dark:bg-[#0B1118] transition-colors">
+    <div className="w-full relative min-h-screen">
       {/* ========================================================= */}
-      {/* ATMOSPHERIC BACKGROUND: BIG SUR COASTAL PANORAMA FLANKS   */}
+      {/* ATMOSPHERIC BACKGROUND: VAST BIG SUR COASTAL FOREST & SEA */}
+      {/* (VISIBLE IN BOTH LIGHT & DARK THEMES — ELEGANTLY FADED)    */}
       {/* ========================================================= */}
       <div
-        className="absolute inset-0 pointer-events-none select-none z-0 overflow-hidden"
+        className="fixed inset-0 pointer-events-none select-none z-0 overflow-hidden"
         aria-hidden="true"
       >
-        {/* Full-Height Left Coastline Flank (Ocean Cliffs, Sea Surf & Mountain Slopes) */}
-        <div className="absolute top-0 bottom-0 left-0 w-44 sm:w-60 md:w-72 lg:w-80 xl:w-96 2xl:w-[420px] overflow-hidden">
-          <div
-            className="w-full h-full bg-cover bg-left bg-repeat-y opacity-90 dark:opacity-30 transition-opacity"
-            style={{
-              backgroundImage: "url('/left-flank.jpg')",
-              backgroundSize: '100% auto',
-            }}
-          />
-          {/* Inner Edge Feathering into Warm Center */}
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#FAF7F5]/40 to-[#FAF7F5] dark:from-transparent dark:via-[#0B1118]/50 dark:to-[#0B1118]" />
-        </div>
+        {/* Vast coastal pine and redwood forest meeting the Pacific Ocean with morning mist */}
+        <div
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-40 dark:opacity-45 transition-all duration-700"
+          style={{
+            backgroundImage: "url('/coastal-forest-landscape.jpg')",
+          }}
+        />
 
-        {/* Full-Height Right Mountain Flank (Golden Santa Lucia Ridges & Misty Peaks) */}
-        <div className="absolute top-0 bottom-0 right-0 w-44 sm:w-60 md:w-72 lg:w-80 xl:w-96 2xl:w-[420px] overflow-hidden">
-          <div
-            className="w-full h-full bg-cover bg-right bg-repeat-y opacity-90 dark:opacity-30 transition-opacity"
-            style={{
-              backgroundImage: "url('/right-flank.jpg')",
-              backgroundSize: '100% auto',
-            }}
-          />
-          {/* Inner Edge Feathering into Warm Center */}
-          <div className="absolute inset-0 bg-gradient-to-l from-transparent via-[#FAF7F5]/40 to-[#FAF7F5] dark:from-transparent dark:via-[#0B1118]/50 dark:to-[#0B1118]" />
-        </div>
+        {/* Soft, luminous mist wash: in light mode gentle mist; in dark mode deep dark tint so trees & mountains show through subtly while text is 100% visible */}
+        <div className="absolute inset-0 bg-[#FAF7F5]/75 dark:bg-[#0B1118]/65 backdrop-blur-[0.5px]" />
 
-        {/* Hero Upper Atmosphere Panoramic Wash */}
-        <div className="absolute top-0 left-0 right-0 h-[650px] overflow-hidden">
-          <div
-            className="w-full h-full bg-cover bg-top sm:bg-center opacity-30 dark:opacity-15"
-            style={{
-              backgroundImage: "url('/big-sur-bg.jpg')",
-            }}
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-[#FAF7F5]/20 via-[#FAF7F5]/60 to-[#FAF7F5] dark:from-[#0B1118]/30 dark:via-[#0B1118]/70 dark:to-[#0B1118]" />
-        </div>
+        {/* Subtle Ambient Vignette Framing */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(250,247,245,0.35)_0%,rgba(250,247,245,0.1)_70%,rgba(250,247,245,0.4)_100%)] dark:bg-[radial-gradient(ellipse_at_center,rgba(11,17,24,0.4)_0%,rgba(11,17,24,0.1)_70%,rgba(11,17,24,0.5)_100%)]" />
       </div>
 
       <div className="relative z-10 w-full">
@@ -81,37 +59,41 @@ export const PublicPage: React.FC = () => {
         {/* ========================================================= */}
         <section
           id="welcome"
-          className="relative pt-10 pb-16 md:pt-16 md:pb-24 px-4 sm:px-6 lg:px-8 border-b border-[#E9E7E5] dark:border-[rgba(160,180,195,0.14)]"
+          className="relative pt-12 pb-20 md:pt-18 md:pb-28 px-4 sm:px-8 lg:px-12 border-b border-[#E9E7E5] dark:border-[rgba(160,180,195,0.14)]"
         >
-          <div className="max-w-7xl mx-auto">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
-              {/* Left Column: Heading, Subtitle & Action Pills */}
-              <div className="lg:col-span-5 space-y-6">
-                <h1 className="text-4xl sm:text-5xl lg:text-[52px] font-bold tracking-tight text-[#191A1F] dark:text-[#F3F6F8] leading-[1.12]">
+          <div className="max-w-[1440px] mx-auto">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+              {/* Left Column: Heading, Subtitle & Action Pills (Protected by frosted card plate so all text is 100% visible) */}
+              <div className="lg:col-span-5 space-y-7 bg-white/92 dark:bg-[#111C28]/92 backdrop-blur-md p-8 sm:p-10 rounded-3xl border border-[#E9E7E5] dark:border-[rgba(160,180,195,0.16)] shadow-lg">
+                <div className="inline-block text-xs sm:text-sm font-mono uppercase tracking-widest text-[#478ED8] dark:text-[#36C5D9] font-bold">
+                  Big Sur Wildfire Intelligence Initiative
+                </div>
+
+                <h1 className="text-4xl sm:text-5xl lg:text-[54px] font-extrabold tracking-tight text-[#111827] dark:text-[#F9FAFB] leading-[1.12]">
                   After the fire, understand what changed.
                 </h1>
 
-                <p className="text-base sm:text-lg text-[#6B7280] dark:text-[#AAB5C2] leading-relaxed font-normal max-w-xl">
+                <p className="text-base sm:text-lg lg:text-xl text-[#374151] dark:text-[#D1D5DB] leading-relaxed font-normal">
                   An interactive research initiative combining satellite intelligence and watershed
                   analysis to investigate post-wildfire landscape changes in Big Sur, California.
                 </p>
 
                 {/* Actions: Explore Research Dashboard + About the Project */}
-                <div className="flex flex-wrap items-center gap-3 pt-2">
+                <div className="flex flex-wrap items-center gap-4 pt-2">
                   <Link
                     to="/dashboard/overview"
-                    className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full text-sm font-semibold bg-[#191A1F] text-white hover:bg-black dark:bg-[#36C5D9] dark:text-[#0B1118] dark:hover:bg-[#2EB0C2] transition-all shadow-sm active:scale-95 group cursor-pointer"
+                    className="inline-flex items-center gap-2.5 px-8 py-4 rounded-full text-base sm:text-lg font-bold bg-[#111827] text-white hover:bg-black dark:bg-[#36C5D9] dark:text-[#0B1118] dark:hover:bg-[#2EB0C2] transition-all shadow-md active:scale-95 group cursor-pointer"
                   >
                     <span className="pointer-events-none">Explore Research Dashboard</span>
-                    <ArrowUpRight className="w-4 h-4 pointer-events-none group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                    <ArrowUpRight className="w-5 h-5 pointer-events-none group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                   </Link>
 
                   <button
                     onClick={() => scrollTo('about')}
-                    className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full text-sm font-semibold text-[#191A1F] dark:text-[#F3F6F8] bg-white dark:bg-[#111C28] hover:bg-[#FAF7F5] dark:hover:bg-white/5 border border-[#E9E7E5] dark:border-[rgba(160,180,195,0.2)] transition-all cursor-pointer shadow-2xs"
+                    className="inline-flex items-center gap-2 px-7 py-4 rounded-full text-base sm:text-lg font-semibold text-[#111827] dark:text-[#F9FAFB] bg-white dark:bg-[#111C28] hover:bg-[#FAF7F5] dark:hover:bg-white/5 border border-[#E9E7E5] dark:border-[rgba(160,180,195,0.2)] transition-all cursor-pointer shadow-xs"
                   >
                     <span className="pointer-events-none">About the Project</span>
-                    <ChevronDown className="w-4 h-4 pointer-events-none text-[#6B7280] dark:text-gray-400" />
+                    <ChevronDown className="w-5 h-5 pointer-events-none text-[#6B7280] dark:text-gray-400" />
                   </button>
                 </div>
               </div>
@@ -120,9 +102,9 @@ export const PublicPage: React.FC = () => {
               <div className="lg:col-span-7">
                 <div className="relative rounded-3xl overflow-hidden border border-[#E9E7E5] dark:border-[rgba(160,180,195,0.2)] shadow-xl bg-white dark:bg-[#090D14]">
                   {/* Card Header Bar */}
-                  <div className="px-5 py-3.5 bg-white dark:bg-[#111C28] border-b border-[#E9E7E5] dark:border-[rgba(160,180,195,0.14)] flex flex-wrap items-center justify-between gap-3 text-xs">
-                    <div className="flex items-center gap-2">
-                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FAF7F5] dark:bg-[#172330] text-[#191A1F] dark:text-[#F3F6F8] font-mono text-[11px] font-semibold border border-[#E9E7E5] dark:border-gray-700">
+                  <div className="px-6 py-4 bg-white dark:bg-[#111C28] border-b border-[#E9E7E5] dark:border-[rgba(160,180,195,0.14)] flex flex-wrap items-center justify-between gap-3 text-xs sm:text-sm">
+                    <div className="flex items-center gap-2.5">
+                      <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FAF7F5] dark:bg-[#172330] text-[#111827] dark:text-[#F9FAFB] font-mono text-xs sm:text-sm font-bold border border-[#E9E7E5] dark:border-gray-700">
                         BIG SUR STUDY AREA · MONTEREY COUNTY, CA
                       </span>
                       <button
@@ -130,80 +112,81 @@ export const PublicPage: React.FC = () => {
                           const resetBtn = document.querySelector('[title="Reset view"]') as HTMLButtonElement;
                           if (resetBtn) resetBtn.click();
                         }}
-                        className="p-1 rounded-lg text-[#6B7280] hover:text-[#191A1F] dark:text-gray-400 dark:hover:text-white transition-colors cursor-pointer"
+                        className="p-1.5 rounded-lg text-[#6B7280] hover:text-[#111827] dark:text-gray-400 dark:hover:text-white transition-colors cursor-pointer"
                         title="Reset Map Orientation"
                         aria-label="Reset Map Orientation"
                       >
-                        <RotateCcw className="w-3.5 h-3.5" />
+                        <RotateCcw className="w-4 h-4" />
                       </button>
                     </div>
 
-                    <div className="flex items-center gap-2 font-mono text-[11px] text-[#6B7280] dark:text-gray-400">
-                      <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+                    <div className="flex items-center gap-2 font-mono text-xs sm:text-sm text-[#6B7280] dark:text-gray-400">
+                      <span className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
                       <span>Awaiting MapTiler API Key in .env.local</span>
                     </div>
                   </div>
 
-                  {/* Real MapLibre Geospatial Map Instance */}
-                  <div className="relative h-[410px] w-full bg-[#E5E3DF] dark:bg-[#090D14]">
+                  {/* Real MapLibre Geospatial Map Instance — Substantial & Comfortable Height */}
+                  <div className="relative h-[480px] sm:h-[540px] w-full bg-[#E5E3DF] dark:bg-[#090D14]">
                     <InteractiveMap
                       height="100%"
                       showFires={true}
                       showWatersheds={true}
                       defaultView="hybrid"
                       interactive={true}
+                      showInternalControls={false}
                     />
 
                     {/* Compact In-Map Legend Pill */}
-                    <div className="absolute bottom-3 left-3 z-10 bg-white/95 dark:bg-[#111C28]/95 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-[#E9E7E5] dark:border-gray-700 shadow-sm flex items-center gap-3 text-[11px] font-mono">
-                      <span className="flex items-center gap-1.5 text-[#191A1F] dark:text-gray-200">
-                        <span className="w-2.5 h-2.5 rounded-full bg-[#F49A48]"></span>
+                    <div className="absolute bottom-4 left-4 z-10 bg-white/95 dark:bg-[#111C28]/95 backdrop-blur-md px-4 py-2 rounded-full border border-[#E9E7E5] dark:border-gray-700 shadow-md flex items-center gap-4 text-xs font-mono">
+                      <span className="flex items-center gap-2 text-[#111827] dark:text-gray-200">
+                        <span className="w-3 h-3 rounded-full bg-[#F49A48]"></span>
                         <span>Timber Fire (Orange)</span>
                       </span>
-                      <span className="flex items-center gap-1.5 text-[#191A1F] dark:text-gray-200">
-                        <span className="w-2.5 h-2.5 rounded-full bg-[#F06470]"></span>
+                      <span className="flex items-center gap-2 text-[#111827] dark:text-gray-200">
+                        <span className="w-3 h-3 rounded-full bg-[#F06470]"></span>
                         <span>Plaskett Fire (Red)</span>
                       </span>
-                      <span className="flex items-center gap-1.5 text-[#191A1F] dark:text-gray-200">
-                        <span className="w-2.5 h-2.5 rounded-full bg-[#29C9D2]"></span>
+                      <span className="flex items-center gap-2 text-[#111827] dark:text-gray-200">
+                        <span className="w-3 h-3 rounded-full bg-[#29C9D2]"></span>
                         <span>HUC-12 Basins (Cyan)</span>
                       </span>
                     </div>
                   </div>
 
                   {/* Bottom Preliminary Processing Inventory Strip */}
-                  <div className="bg-[#FAF7F5] dark:bg-[#121418] px-6 py-3.5 border-t border-[#E9E7E5] dark:border-gray-800 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs font-mono text-[#191A1F] dark:text-gray-300">
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-2 h-2 rounded-full bg-[#29C9D2]"></div>
+                  <div className="bg-[#FAF7F5] dark:bg-[#121418] px-6 py-4.5 border-t border-[#E9E7E5] dark:border-gray-800 grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs sm:text-sm font-mono text-[#111827] dark:text-gray-300">
+                    <div className="flex items-center gap-3">
+                      <div className="w-2.5 h-2.5 rounded-full bg-[#29C9D2]"></div>
                       <div>
-                        <span className="text-[#6B7280] dark:text-gray-400 block text-[10px] uppercase font-semibold">
+                        <span className="text-[#6B7280] dark:text-gray-400 block text-[11px] uppercase font-semibold">
                           Preliminary Catchments
                         </span>
-                        <span className="text-[#191A1F] dark:text-white font-bold text-xs">
+                        <span className="text-[#111827] dark:text-white font-bold text-sm">
                           {inventory.huc12Units} HUC-12 Watershed Units
                         </span>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-2 h-2 rounded-full bg-[#478ED8]"></div>
+                    <div className="flex items-center gap-3">
+                      <div className="w-2.5 h-2.5 rounded-full bg-[#478ED8]"></div>
                       <div>
-                        <span className="text-[#6B7280] dark:text-gray-400 block text-[10px] uppercase font-semibold">
+                        <span className="text-[#6B7280] dark:text-gray-400 block text-[11px] uppercase font-semibold">
                           Pre-Fire Observation Scenes
                         </span>
-                        <span className="text-[#191A1F] dark:text-white font-bold text-xs">
+                        <span className="text-[#111827] dark:text-white font-bold text-sm">
                           {inventory.preFireScenes} Pre-Fire Sentinel-2 Scenes
                         </span>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-2 h-2 rounded-full bg-[#F49A48]"></div>
+                    <div className="flex items-center gap-3">
+                      <div className="w-2.5 h-2.5 rounded-full bg-[#F49A48]"></div>
                       <div>
-                        <span className="text-[#6B7280] dark:text-gray-400 block text-[10px] uppercase font-semibold">
+                        <span className="text-[#6B7280] dark:text-gray-400 block text-[11px] uppercase font-semibold">
                           Post-Fire Observation Scenes
                         </span>
-                        <span className="text-[#191A1F] dark:text-white font-bold text-xs">
+                        <span className="text-[#111827] dark:text-white font-bold text-sm">
                           {inventory.postFireScenes} Post-Fire Sentinel-2 Scenes
                         </span>
                       </div>
@@ -212,16 +195,16 @@ export const PublicPage: React.FC = () => {
                 </div>
 
                 {/* Operational Inventory Notice Banner */}
-                <div className="p-3.5 rounded-xl bg-blue-50/70 dark:bg-[#111C28] border border-blue-200/80 dark:border-[rgba(160,180,195,0.18)] text-xs font-mono text-[#065EA1] dark:text-[#AAB5C2] flex items-center justify-between gap-4 mt-4">
-                  <div className="flex items-center gap-2">
-                    <Info className="w-4 h-4 shrink-0 text-[#478ED8] dark:text-[#36C5D9]" />
+                <div className="p-4.5 rounded-2xl bg-blue-50/80 dark:bg-[#111C28] border border-blue-200/80 dark:border-[rgba(160,180,195,0.18)] text-xs sm:text-sm font-mono text-[#065EA1] dark:text-[#AAB5C2] flex items-center justify-between gap-4 mt-5 shadow-2xs">
+                  <div className="flex items-center gap-3">
+                    <Info className="w-5 h-5 shrink-0 text-[#478ED8] dark:text-[#36C5D9]" />
                     <span>
                       <strong>Operational Inventory Notice:</strong> Preliminary processing inventory metrics shown. Vector boundaries displayed from actual project GeoJSON (EPSG:32610 UTM Zone 10N).
                     </span>
                   </div>
                   <Link
                     to="/dashboard/overview"
-                    className="text-[#478ED8] dark:text-[#36C5D9] hover:text-blue-900 dark:hover:text-cyan-300 font-bold underline shrink-0 cursor-pointer"
+                    className="text-[#478ED8] dark:text-[#36C5D9] hover:text-blue-900 dark:hover:text-cyan-300 font-bold underline shrink-0 cursor-pointer text-sm"
                   >
                     Open Console →
                   </Link>
@@ -236,21 +219,21 @@ export const PublicPage: React.FC = () => {
         {/* ========================================================= */}
         <section
           id="about"
-          className="py-20 md:py-28 px-4 sm:px-6 lg:px-8 border-b border-[#E9E7E5] dark:border-[rgba(160,180,195,0.14)]"
+          className="py-20 md:py-28 px-4 sm:px-8 lg:px-12 border-b border-[#E9E7E5] dark:border-[rgba(160,180,195,0.14)]"
         >
-          <div className="max-w-7xl mx-auto space-y-12">
+          <div className="max-w-[1440px] mx-auto space-y-12">
             {/* Clean Editorial Two-Column Composition */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
               {/* Left Column: Research Context & 4 Scientific Pillars */}
-              <div className="lg:col-span-7 space-y-6">
+              <div className="lg:col-span-7 space-y-8 bg-white/92 dark:bg-[#111C28]/92 backdrop-blur-md p-8 sm:p-10 rounded-3xl border border-[#E9E7E5] dark:border-[rgba(160,180,195,0.16)] shadow-lg">
                 <div>
-                  <div className="text-xs uppercase font-mono tracking-widest text-[#478ED8] dark:text-[#36C5D9] font-bold mb-2">
+                  <div className="text-xs sm:text-sm uppercase font-mono tracking-widest text-[#478ED8] dark:text-[#36C5D9] font-bold mb-3">
                     Research Context
                   </div>
-                  <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-[#191A1F] dark:text-[#F3F6F8] mb-4">
+                  <h2 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-[#111827] dark:text-[#F9FAFB] mb-4">
                     About the Project
                   </h2>
-                  <p className="text-base text-[#6B7280] dark:text-[#AAB5C2] leading-relaxed">
+                  <p className="text-base sm:text-lg text-[#374151] dark:text-[#D1D5DB] leading-relaxed">
                     The project investigates post-wildfire landscape changes across the Timber and
                     Plaskett fire complexes in Big Sur, California, using Sentinel-2 optical
                     observations, NISAR radar observations, and watershed-level terrain analysis.
@@ -401,84 +384,84 @@ export const PublicPage: React.FC = () => {
         </section>
 
         {/* ========================================================= */}
-        {/* SECTION 3: OUR VISION (EXACT SPECIFICATION)               */}
+        {/* SECTION 3: OUR VISION (ENLARGED BOXES & TYPOGRAPHY)       */}
         {/* ========================================================= */}
         <section
           id="vision"
-          className="py-20 md:py-28 px-4 sm:px-6 lg:px-8 border-b border-[#E9E7E5] dark:border-[rgba(160,180,195,0.14)]"
+          className="py-20 md:py-28 px-4 sm:px-8 lg:px-12 border-b border-[#E9E7E5] dark:border-[rgba(160,180,195,0.14)]"
         >
-          <div className="max-w-5xl mx-auto">
+          <div className="max-w-[1440px] mx-auto">
             {/* Header */}
-            <div className="text-center max-w-3xl mx-auto mb-12">
-              <div className="text-xs uppercase font-mono tracking-widest text-[#478ED8] dark:text-[#36C5D9] font-bold mb-3">
+            <div className="text-center max-w-4xl mx-auto mb-14">
+              <div className="text-xs sm:text-sm uppercase font-mono tracking-widest text-[#478ED8] dark:text-[#36C5D9] font-bold mb-3">
                 Guiding Direction
               </div>
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-[#191A1F] dark:text-[#F3F6F8] mb-8">
+              <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-[#111827] dark:text-[#F9FAFB] mb-8">
                 Our Vision
               </h2>
 
-              {/* Exact Proposed Vision Statement Box */}
-              <blockquote className="text-xl sm:text-2xl font-medium tracking-tight text-[#191A1F] dark:text-[#F3F6F8] leading-relaxed p-8 sm:p-10 rounded-3xl bg-white dark:bg-[#111C28] border border-[#E9E7E5] dark:border-[rgba(160,180,195,0.14)] shadow-sm">
+              {/* Exact Proposed Vision Statement Box — Substantially Bigger */}
+              <blockquote className="text-2xl sm:text-3xl lg:text-4xl font-semibold tracking-tight text-[#111827] dark:text-[#F9FAFB] leading-relaxed p-10 sm:p-14 lg:p-16 rounded-3xl bg-white/92 dark:bg-[#111C28]/92 backdrop-blur-md border border-[#E9E7E5] dark:border-[rgba(160,180,195,0.16)] shadow-lg">
                 “To make post-wildfire landscape changes easier to observe, understand and investigate
                 through the integration of satellite intelligence and geographical analysis.”
               </blockquote>
             </div>
 
-            {/* Exactly Three Concise Research Objectives */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Exactly Three Concise Research Objectives — Substantially Bigger Boxes */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {/* Objective 1 */}
-              <div className="p-7 rounded-2xl bg-white dark:bg-[#111C28] border border-[#E9E7E5] dark:border-[rgba(160,180,195,0.14)] shadow-xs flex flex-col justify-between hover:border-[#D8895B]/40 transition-colors">
+              <div className="p-8 sm:p-10 rounded-3xl bg-white/92 dark:bg-[#111C28]/92 backdrop-blur-md border border-[#E9E7E5] dark:border-[rgba(160,180,195,0.16)] shadow-lg flex flex-col justify-between hover:border-[#D8895B]/50 transition-all group">
                 <div>
-                  <div className="px-2.5 py-1 rounded-lg bg-[#FDF3EB] dark:bg-[#1F1E24] text-[#D8895B] border border-[#F5DAC8] dark:border-[#523A2E] font-mono font-bold text-xs inline-block mb-4">
+                  <div className="px-3.5 py-1.5 rounded-xl bg-[#FDF3EB] dark:bg-[#1F1E24] text-[#D8895B] border border-[#F5DAC8] dark:border-[#523A2E] font-mono font-bold text-sm inline-block mb-5">
                     01
                   </div>
-                  <h3 className="text-base font-bold text-[#191A1F] dark:text-[#F3F6F8] mb-2.5">
+                  <h3 className="text-xl sm:text-2xl font-bold text-[#111827] dark:text-[#F9FAFB] mb-3">
                     Observe Landscape Changes
                   </h3>
-                  <p className="text-xs sm:text-sm text-[#6B7280] dark:text-[#AAB5C2] leading-relaxed">
+                  <p className="text-base sm:text-lg text-[#374151] dark:text-[#D1D5DB] leading-relaxed">
                     Track multi-temporal burn severity perimeters, vegetative loss, and soil exposure
                     across the Santa Lucia coastal mountain range.
                   </p>
                 </div>
-                <div className="mt-6 pt-4 border-t border-gray-100 dark:border-[rgba(160,180,195,0.1)] text-xs font-mono text-[#D8895B]">
+                <div className="mt-8 pt-4 border-t border-gray-100 dark:border-[rgba(160,180,195,0.1)] text-xs sm:text-sm font-mono text-[#D8895B] font-semibold">
                   Objective 01 · Landscape Observation
                 </div>
               </div>
 
               {/* Objective 2 */}
-              <div className="p-7 rounded-2xl bg-white dark:bg-[#111C28] border border-[#E9E7E5] dark:border-[rgba(160,180,195,0.14)] shadow-xs flex flex-col justify-between hover:border-[#D8895B]/40 transition-colors">
+              <div className="p-8 sm:p-10 rounded-3xl bg-white/92 dark:bg-[#111C28]/92 backdrop-blur-md border border-[#E9E7E5] dark:border-[rgba(160,180,195,0.16)] shadow-lg flex flex-col justify-between hover:border-[#D8895B]/50 transition-all group">
                 <div>
-                  <div className="px-2.5 py-1 rounded-lg bg-[#FDF3EB] dark:bg-[#1F1E24] text-[#D8895B] border border-[#F5DAC8] dark:border-[#523A2E] font-mono font-bold text-xs inline-block mb-4">
+                  <div className="px-3.5 py-1.5 rounded-xl bg-[#FDF3EB] dark:bg-[#1F1E24] text-[#D8895B] border border-[#F5DAC8] dark:border-[#523A2E] font-mono font-bold text-sm inline-block mb-5">
                     02
                   </div>
-                  <h3 className="text-base font-bold text-[#191A1F] dark:text-[#F3F6F8] mb-2.5">
+                  <h3 className="text-xl sm:text-2xl font-bold text-[#111827] dark:text-[#F9FAFB] mb-3">
                     Understand Observations
                   </h3>
-                  <p className="text-xs sm:text-sm text-[#6B7280] dark:text-[#AAB5C2] leading-relaxed">
+                  <p className="text-base sm:text-lg text-[#374151] dark:text-[#D1D5DB] leading-relaxed">
                     Synthesise optical spectral indices with L-band Synthetic Aperture Radar
                     backscatter to resolve discrepancies caused by ash charring and canopy moisture.
                   </p>
                 </div>
-                <div className="mt-6 pt-4 border-t border-gray-100 dark:border-[rgba(160,180,195,0.1)] text-xs font-mono text-[#D8895B]">
+                <div className="mt-8 pt-4 border-t border-gray-100 dark:border-[rgba(160,180,195,0.1)] text-xs sm:text-sm font-mono text-[#D8895B] font-semibold">
                   Objective 02 · Sensor Concordance
                 </div>
               </div>
 
               {/* Objective 3 */}
-              <div className="p-7 rounded-2xl bg-white dark:bg-[#111C28] border border-[#E9E7E5] dark:border-[rgba(160,180,195,0.14)] shadow-xs flex flex-col justify-between hover:border-[#D8895B]/40 transition-colors">
+              <div className="p-8 sm:p-10 rounded-3xl bg-white/92 dark:bg-[#111C28]/92 backdrop-blur-md border border-[#E9E7E5] dark:border-[rgba(160,180,195,0.16)] shadow-lg flex flex-col justify-between hover:border-[#D8895B]/50 transition-all group">
                 <div>
-                  <div className="px-2.5 py-1 rounded-lg bg-[#FDF3EB] dark:bg-[#1F1E24] text-[#D8895B] border border-[#F5DAC8] dark:border-[#523A2E] font-mono font-bold text-xs inline-block mb-4">
+                  <div className="px-3.5 py-1.5 rounded-xl bg-[#FDF3EB] dark:bg-[#1F1E24] text-[#D8895B] border border-[#F5DAC8] dark:border-[#523A2E] font-mono font-bold text-sm inline-block mb-5">
                     03
                   </div>
-                  <h3 className="text-base font-bold text-[#191A1F] dark:text-[#F3F6F8] mb-2.5">
+                  <h3 className="text-xl sm:text-2xl font-bold text-[#111827] dark:text-[#F9FAFB] mb-3">
                     Identify Priority Watersheds
                   </h3>
-                  <p className="text-xs sm:text-sm text-[#6B7280] dark:text-[#AAB5C2] leading-relaxed">
+                  <p className="text-base sm:text-lg text-[#374151] dark:text-[#D1D5DB] leading-relaxed">
                     Highlight steep coastal drainage basins (&gt;30° gradient) for further monitoring,
                     assisting local emergency managers and road maintenance teams.
                   </p>
                 </div>
-                <div className="mt-6 pt-4 border-t border-gray-100 dark:border-[rgba(160,180,195,0.1)] text-xs font-mono text-[#D8895B]">
+                <div className="mt-8 pt-4 border-t border-gray-100 dark:border-[rgba(160,180,195,0.1)] text-xs sm:text-sm font-mono text-[#D8895B] font-semibold">
                   Objective 03 · Monitoring Prioritization
                 </div>
               </div>
@@ -491,87 +474,53 @@ export const PublicPage: React.FC = () => {
         {/* ========================================================= */}
         <section
           id="team"
-          className="relative py-20 md:py-28 px-4 sm:px-6 lg:px-8 border-b border-[#E9E7E5] dark:border-[rgba(160,180,195,0.14)] overflow-hidden"
+          className="relative py-20 md:py-28 px-4 sm:px-8 lg:px-12 border-b border-[#E9E7E5] dark:border-[rgba(160,180,195,0.14)]"
         >
-          {/* Subtle Geospatial / Topographic Contour Background Motif */}
-          <div className="absolute inset-0 pointer-events-none select-none overflow-hidden" aria-hidden="true">
-            <svg
-              className="absolute w-full h-full text-[#D8895B] opacity-[0.05] dark:opacity-[0.06]"
-              viewBox="0 0 1200 600"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              preserveAspectRatio="none"
-            >
-              <path d="M-100 120 C 200 80, 450 180, 700 130 C 950 80, 1100 160, 1300 110" stroke="currentColor" strokeWidth="1.2" />
-              <path d="M-100 190 C 180 150, 420 250, 680 200 C 940 150, 1120 230, 1300 180" stroke="currentColor" strokeWidth="1.2" />
-              <path d="M-100 260 C 220 210, 480 320, 720 270 C 960 220, 1140 300, 1300 250" stroke="currentColor" strokeWidth="1.2" />
-              <path d="M-100 330 C 190 280, 440 390, 710 340 C 980 290, 1150 370, 1300 320" stroke="currentColor" strokeWidth="1.2" />
-              <path d="M-100 400 C 230 350, 470 460, 740 410 C 1000 360, 1170 440, 1300 390" stroke="currentColor" strokeWidth="1.2" />
-            </svg>
-            <div className="absolute top-6 left-8 font-mono text-[10px] tracking-widest text-[#D8895B]/30 hidden sm:block">
-              + 36.27° N · 100m CONTOURS
-            </div>
-            <div className="absolute bottom-6 right-8 font-mono text-[10px] tracking-widest text-[#D8895B]/30 hidden sm:block">
-              + 121.81° W · EPSG:32610
-            </div>
-          </div>
-
-          <div className="relative max-w-5xl mx-auto">
+          <div className="relative max-w-[1440px] mx-auto">
             {/* Heading */}
-            <div className="text-center max-w-xl mx-auto mb-12">
-              <div className="text-xs uppercase font-mono tracking-widest text-[#D8895B] font-bold mb-2.5">
+            <div className="text-center max-w-xl mx-auto mb-14">
+              <div className="text-xs sm:text-sm uppercase font-mono tracking-widest text-[#D8895B] font-bold mb-3">
                 AETHERIX · PROJECT TEAM
               </div>
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-[#191A1F] dark:text-[#F3F6F8] mb-3">
+              <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-[#111827] dark:text-[#F9FAFB] mb-4">
                 Meet the Team
               </h2>
-              <p className="text-sm sm:text-base text-[#6B7280] dark:text-[#AAB5C2]">
-                The people behind AFTER THE FIRE.
+              <p className="text-base sm:text-lg text-[#4B5563] dark:text-[#CBD5E1]">
+                The researchers and developers behind AFTER THE FIRE.
               </p>
             </div>
 
             {/* EXACTLY TWO PROFILES — Balanced Two-Column Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 max-w-4xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-10 max-w-5xl mx-auto">
               {TEAM_MEMBERS.map((member, idx) => (
                 <div
                   key={member.name}
-                  className="relative overflow-hidden p-7 sm:p-8 rounded-2xl bg-white/95 dark:bg-[#111C28]/95 backdrop-blur-xs border border-[#E9E7E5] dark:border-[rgba(160,180,195,0.14)] flex flex-col justify-between hover:border-[#D8895B]/50 transition-all shadow-xs group"
+                  className="relative overflow-hidden p-8 sm:p-10 rounded-3xl bg-white/92 dark:bg-[#111C28] backdrop-blur-md border border-[#E9E7E5] dark:border-[rgba(160,180,195,0.16)] flex flex-col justify-between hover:border-[#D8895B]/50 transition-all shadow-lg group"
                 >
-                  {/* Subtle Background Watermark Insignia/Logo */}
-                  <div
-                    className="absolute -right-6 -bottom-6 w-44 h-44 pointer-events-none select-none text-[#D8895B]/[0.08] dark:text-[#D98A60]/[0.09] transition-transform duration-500 group-hover:scale-105"
-                    aria-hidden="true"
-                  >
-                    <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-full h-full">
-                      <circle cx="50" cy="50" r="44" strokeDasharray="3 3" />
-                      <circle cx="50" cy="50" r="32" />
-                      <circle cx="50" cy="50" r="18" />
-                      <line x1="50" y1="2" x2="50" y2="98" strokeDasharray="2 2" />
-                      <line x1="2" y1="50" x2="98" y2="50" strokeDasharray="2 2" />
-                      <polygon points="50,22 58,42 78,50 58,58 50,78 42,58 22,50 42,42" fill="currentColor" fillOpacity="0.15" />
-                    </svg>
-                  </div>
-
                   <div className="relative z-10">
-                    <div className="flex items-center justify-between mb-4">
-                      <span className="text-[11px] font-mono uppercase tracking-widest text-[#6B7280] dark:text-[#788796]">
-                        AETHERIX RESEARCH
-                      </span>
-                      <span className="text-xs font-mono font-bold text-[#D8895B]">
+                    {/* Header Badge: AETHERIX RESEARCH */}
+                    <div className="flex items-center justify-between mb-6">
+                      <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 dark:bg-[#172330] border border-blue-200/80 dark:border-[rgba(160,180,195,0.18)] text-xs font-mono text-[#478ED8] dark:text-[#36C5D9] font-bold">
+                        <Satellite className="w-4 h-4 text-[#478ED8] dark:text-[#36C5D9]" />
+                        <span>AETHERIX RESEARCH</span>
+                      </div>
+                      <span className="text-sm font-mono font-bold text-[#D8895B]">
                         0{idx + 1}
                       </span>
                     </div>
-                    <h3 className="text-2xl font-bold tracking-tight text-[#191A1F] dark:text-[#F3F6F8] leading-snug">
+
+                    {/* Team Member Name */}
+                    <h3 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-[#111827] dark:text-[#F9FAFB] leading-tight">
                       {member.name}
                     </h3>
                   </div>
 
                   {/* Icon & Label Links */}
-                  <div className="relative z-10 flex items-center gap-6 mt-8 pt-5 border-t border-[#E9E7E5] dark:border-[rgba(160,180,195,0.12)]">
+                  <div className="relative z-10 flex items-center gap-6 mt-10 pt-6 border-t border-[#E9E7E5] dark:border-[rgba(160,180,195,0.14)]">
                     {member.email && (
                       <a
                         href={`mailto:${member.email}`}
-                        className="inline-flex items-center gap-2 text-xs font-mono text-[#191A1F] dark:text-[#F3F6F8] hover:text-[#D8895B] transition-colors cursor-pointer py-1"
+                        className="inline-flex items-center gap-2 text-sm font-mono text-[#111827] dark:text-[#F9FAFB] hover:text-[#D8895B] transition-colors cursor-pointer py-1 font-semibold"
                         aria-label={`Email ${member.name}`}
                       >
                         <Mail className="w-4 h-4 text-[#6B7280] group-hover:text-[#D8895B] transition-colors" />
@@ -586,7 +535,7 @@ export const PublicPage: React.FC = () => {
                         href={member.linkedinUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 text-xs font-mono text-[#191A1F] dark:text-[#F3F6F8] hover:text-[#D8895B] transition-colors cursor-pointer py-1"
+                        className="inline-flex items-center gap-2 text-sm font-mono text-[#111827] dark:text-[#F9FAFB] hover:text-[#D8895B] transition-colors cursor-pointer py-1 font-semibold"
                         aria-label={`LinkedIn ${member.name}`}
                       >
                         <Linkedin className="w-4 h-4 text-[#6B7280] group-hover:text-[#D8895B] transition-colors" />
@@ -605,43 +554,43 @@ export const PublicPage: React.FC = () => {
         {/* ========================================================= */}
         <section
           id="contact"
-          className="py-20 md:py-28 px-4 sm:px-6 lg:px-8 border-b border-[#E9E7E5] dark:border-[rgba(160,180,195,0.14)]"
+          className="py-20 md:py-28 px-4 sm:px-8 lg:px-12 border-b border-[#E9E7E5] dark:border-[rgba(160,180,195,0.14)]"
         >
-          <div className="max-w-6xl mx-auto">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
-              {/* Left Column: Heading & Switcher Tabs */}
-              <div className="lg:col-span-5 space-y-6">
+          <div className="max-w-[1440px] mx-auto">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+              {/* Left Column: Heading & Switcher Tabs (Protected by clean card plate for 100% legibility) */}
+              <div className="lg:col-span-5 space-y-7 bg-white/92 dark:bg-[#111C28]/92 backdrop-blur-md p-8 sm:p-10 rounded-3xl border border-[#E9E7E5] dark:border-[rgba(160,180,195,0.16)] shadow-lg">
                 <div>
-                  <div className="text-xs uppercase font-mono tracking-widest text-[#478ED8] dark:text-[#36C5D9] font-bold mb-3">
+                  <div className="text-xs sm:text-sm uppercase font-mono tracking-widest text-[#478ED8] dark:text-[#36C5D9] font-bold mb-3">
                     Communication
                   </div>
-                  <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-[#191A1F] dark:text-[#F3F6F8] mb-4">
+                  <h2 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-[#111827] dark:text-[#F9FAFB] mb-4">
                     Get in Touch
                   </h2>
-                  <p className="text-sm text-[#6B7280] dark:text-[#AAB5C2] leading-relaxed">
+                  <p className="text-base sm:text-lg text-[#374151] dark:text-[#D1D5DB] leading-relaxed">
                     Inquire about research findings, dataset access, or submit scientific suggestions
                     and feedback.
                   </p>
                 </div>
 
                 {/* Selectable Tabs: CONTACT US | SHARE FEEDBACK */}
-                <div className="inline-flex p-1.5 rounded-full bg-white dark:bg-[#111C28] border border-[#E9E7E5] dark:border-[rgba(160,180,195,0.14)] shadow-2xs">
+                <div className="inline-flex p-1.5 rounded-full bg-[#FAF7F5] dark:bg-[#172330] border border-[#E9E7E5] dark:border-[rgba(160,180,195,0.14)] shadow-xs">
                   <button
                     onClick={() => setActiveTab('contact')}
-                    className={`px-5 py-2.5 rounded-full text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer ${
+                    className={`px-6 py-3 rounded-full text-xs sm:text-sm font-bold uppercase tracking-wider transition-all cursor-pointer ${
                       activeTab === 'contact'
-                        ? 'bg-[#191A1F] text-white shadow-xs dark:bg-[#36C5D9] dark:text-[#0B1118]'
-                        : 'text-[#6B7280] hover:text-[#191A1F] dark:text-[#AAB5C2] dark:hover:text-[#F3F6F8]'
+                        ? 'bg-[#111827] text-white shadow-xs dark:bg-[#36C5D9] dark:text-[#0B1118]'
+                        : 'text-[#6B7280] hover:text-[#111827] dark:text-[#AAB5C2] dark:hover:text-[#F3F6F8]'
                     }`}
                   >
                     <span className="pointer-events-none">Contact Us</span>
                   </button>
                   <button
                     onClick={() => setActiveTab('feedback')}
-                    className={`px-5 py-2.5 rounded-full text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer ${
+                    className={`px-6 py-3 rounded-full text-xs sm:text-sm font-bold uppercase tracking-wider transition-all cursor-pointer ${
                       activeTab === 'feedback'
-                        ? 'bg-[#191A1F] text-white shadow-xs dark:bg-[#36C5D9] dark:text-[#0B1118]'
-                        : 'text-[#6B7280] hover:text-[#191A1F] dark:text-[#AAB5C2] dark:hover:text-[#F3F6F8]'
+                        ? 'bg-[#111827] text-white shadow-xs dark:bg-[#36C5D9] dark:text-[#0B1118]'
+                        : 'text-[#6B7280] hover:text-[#111827] dark:text-[#AAB5C2] dark:hover:text-[#F3F6F8]'
                     }`}
                   >
                     <span className="pointer-events-none">Share Feedback</span>
@@ -650,7 +599,7 @@ export const PublicPage: React.FC = () => {
               </div>
 
               {/* Right Column: Form Container Card */}
-              <div className="lg:col-span-7 bg-white dark:bg-[#111C28] rounded-3xl border border-[#E9E7E5] dark:border-[rgba(160,180,195,0.14)] shadow-sm p-6 sm:p-8">
+              <div className="lg:col-span-7 bg-white dark:bg-[#111C28] rounded-3xl border border-[#E9E7E5] dark:border-[rgba(160,180,195,0.16)] shadow-lg p-8 sm:p-10">
                 {activeTab === 'contact' ? <ContactForm /> : <FeedbackForm />}
               </div>
             </div>

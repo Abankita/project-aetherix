@@ -79,70 +79,17 @@ export class MapService {
     }
 
     // 2. OpenStreetMap Provider (Clean, zero watermarks, 100% reliable)
-    if (provider === 'osm') {
-      return {
-        version: 8,
-        sources: {
-          'osm-tiles': {
-            type: 'raster',
-            tiles: [
-              'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-            ],
-            tileSize: 256,
-            attribution: '© OpenStreetMap contributors',
-          },
-        },
-        layers: [
-          {
-            id: 'background',
-            type: 'background',
-            paint: {
-              'background-color': bgColor,
-            },
-          },
-          {
-            id: 'osm-layer',
-            type: 'raster',
-            source: 'osm-tiles',
-            minzoom: 0,
-            maxzoom: 19,
-            paint: isDark
-              ? {
-                  'raster-saturation': -0.85,
-                  'raster-contrast': 0.25,
-                  'raster-brightness-min': 0.1,
-                  'raster-brightness-max': 0.55,
-                }
-              : {
-                  'raster-saturation': 0.0,
-                  'raster-contrast': 0.05,
-                },
-          },
-        ],
-      };
-    }
-
-    // 3. CARTO Provider (Clean Dark Matter / Voyager)
-    const cartoKey = this.getCartoKey();
-    const tilePath = isDark ? 'rastertiles/dark_all' : 'rastertiles/voyager';
-    // Only append api_key if it's a full key length (>= 24 chars), avoiding partial keys triggering watermarks
-    const tileUrl = cartoKey && cartoKey.length >= 24
-      ? `https://a.basemaps.cartocdn.com/${tilePath}/{z}/{x}/{y}@2x.png?api_key=${encodeURIComponent(cartoKey)}`
-      : `https://a.basemaps.cartocdn.com/${tilePath}/{z}/{x}/{y}@2x.png`;
-
+    // Restored exact original color combination
     return {
       version: 8,
       sources: {
-        'carto-basemap': {
+        'osm-tiles': {
           type: 'raster',
           tiles: [
-            tileUrl,
-            tileUrl.replace('//a.', '//b.'),
-            tileUrl.replace('//a.', '//c.'),
-            tileUrl.replace('//a.', '//d.'),
+            'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
           ],
           tileSize: 256,
-          attribution: '© CARTO · © OpenStreetMap contributors',
+          attribution: '© OpenStreetMap contributors',
         },
       },
       layers: [
@@ -154,11 +101,22 @@ export class MapService {
           },
         },
         {
-          id: 'carto-basemap-layer',
+          id: 'osm-layer',
           type: 'raster',
-          source: 'carto-basemap',
+          source: 'osm-tiles',
           minzoom: 0,
-          maxzoom: 20,
+          maxzoom: 19,
+          paint: isDark
+            ? {
+                'raster-saturation': -0.85,
+                'raster-contrast': 0.25,
+                'raster-brightness-min': 0.1,
+                'raster-brightness-max': 0.55,
+              }
+            : {
+                'raster-saturation': 0.0,
+                'raster-contrast': 0.05,
+              },
         },
       ],
     };

@@ -7,8 +7,8 @@ export const MAP_THEME = {
   // Base map background tone
   basemap: {
     backgroundColor: '#242526',
-    defaultRasterId: 'carto-dark-matter',
-    attribution: '© CARTO · © OpenStreetMap contributors',
+    defaultRasterId: 'osm-standard',
+    attribution: '© OpenStreetMap contributors',
   },
 
   // Fire Complexes

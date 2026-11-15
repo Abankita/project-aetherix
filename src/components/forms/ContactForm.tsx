@@ -141,10 +141,10 @@ export const ContactForm: React.FC = () => {
           </div>
         </div>
       ) : (
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <div>
-              <label className="block text-xs font-mono uppercase tracking-wider text-gray-500 dark:text-[#AAB5C2] mb-1.5">
+              <label className="block text-xs sm:text-sm font-mono uppercase tracking-wider text-gray-700 dark:text-[#CBD5E1] font-semibold mb-2">
                 Full Name <span className="text-red-500">*</span>
               </label>
               <input
@@ -153,22 +153,22 @@ export const ContactForm: React.FC = () => {
                 value={formData.name}
                 onChange={handleChange}
                 placeholder="Dr. Jane Doe"
-                className={`w-full px-4 py-2.5 rounded-xl border text-sm bg-gray-50/60 dark:bg-[#172330] text-[#18191D] dark:text-[#F3F6F8] dark:placeholder-gray-500 focus:outline-none focus:ring-2 transition-all ${
+                className={`w-full px-4 py-3 rounded-xl border text-base bg-gray-50/60 dark:bg-[#172330] text-[#18191D] dark:text-[#F3F6F8] dark:placeholder-gray-500 focus:outline-none focus:ring-2 transition-all ${
                   errors.name
                     ? 'border-red-400 focus:ring-red-300'
                     : 'border-gray-200 dark:border-[rgba(160,180,195,0.18)] focus:border-[#36C5D9] focus:ring-[#36C5D9]/20'
                 }`}
               />
               {errors.name && (
-                <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
-                  <AlertCircle className="w-3 h-3" />
+                <p className="text-xs sm:text-sm text-red-500 mt-1 flex items-center gap-1 font-mono">
+                  <AlertCircle className="w-3.5 h-3.5" />
                   {errors.name}
                 </p>
               )}
             </div>
 
             <div>
-              <label className="block text-xs font-mono uppercase tracking-wider text-gray-500 dark:text-[#AAB5C2] mb-1.5">
+              <label className="block text-xs sm:text-sm font-mono uppercase tracking-wider text-gray-700 dark:text-[#CBD5E1] font-semibold mb-2">
                 Institutional Email <span className="text-red-500">*</span>
               </label>
               <input
@@ -177,15 +177,15 @@ export const ContactForm: React.FC = () => {
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="jane.doe@university.edu"
-                className={`w-full px-4 py-2.5 rounded-xl border text-sm bg-gray-50/60 dark:bg-[#172330] text-[#18191D] dark:text-[#F3F6F8] dark:placeholder-gray-500 focus:outline-none focus:ring-2 transition-all ${
+                className={`w-full px-4 py-3 rounded-xl border text-base bg-gray-50/60 dark:bg-[#172330] text-[#18191D] dark:text-[#F3F6F8] dark:placeholder-gray-500 focus:outline-none focus:ring-2 transition-all ${
                   errors.email
                     ? 'border-red-400 focus:ring-red-300'
                     : 'border-gray-200 dark:border-[rgba(160,180,195,0.18)] focus:border-[#36C5D9] focus:ring-[#36C5D9]/20'
                 }`}
               />
               {errors.email && (
-                <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
-                  <AlertCircle className="w-3 h-3" />
+                <p className="text-xs sm:text-sm text-red-500 mt-1 flex items-center gap-1 font-mono">
+                  <AlertCircle className="w-3.5 h-3.5" />
                   {errors.email}
                 </p>
               )}
@@ -193,7 +193,7 @@ export const ContactForm: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-xs font-mono uppercase tracking-wider text-gray-500 dark:text-[#AAB5C2] mb-1.5">
+            <label className="block text-xs sm:text-sm font-mono uppercase tracking-wider text-gray-700 dark:text-[#CBD5E1] font-semibold mb-2">
               Subject <span className="text-red-500">*</span>
             </label>
             <input
@@ -202,22 +202,22 @@ export const ContactForm: React.FC = () => {
               value={formData.subject}
               onChange={handleChange}
               placeholder="Dataset access / Spatial calibration inquiry"
-              className={`w-full px-4 py-2.5 rounded-xl border text-sm bg-gray-50/60 dark:bg-[#172330] text-[#18191D] dark:text-[#F3F6F8] dark:placeholder-gray-500 focus:outline-none focus:ring-2 transition-all ${
+              className={`w-full px-4 py-3 rounded-xl border text-base bg-gray-50/60 dark:bg-[#172330] text-[#18191D] dark:text-[#F3F6F8] dark:placeholder-gray-500 focus:outline-none focus:ring-2 transition-all ${
                 errors.subject
                   ? 'border-red-400 focus:ring-red-300'
                   : 'border-gray-200 dark:border-[rgba(160,180,195,0.18)] focus:border-[#36C5D9] focus:ring-[#36C5D9]/20'
               }`}
             />
             {errors.subject && (
-              <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
-                <AlertCircle className="w-3 h-3" />
+              <p className="text-xs sm:text-sm text-red-500 mt-1 flex items-center gap-1 font-mono">
+                <AlertCircle className="w-3.5 h-3.5" />
                 {errors.subject}
               </p>
             )}
           </div>
 
           <div>
-            <label className="block text-xs font-mono uppercase tracking-wider text-gray-500 dark:text-[#AAB5C2] mb-1.5">
+            <label className="block text-xs sm:text-sm font-mono uppercase tracking-wider text-gray-700 dark:text-[#CBD5E1] font-semibold mb-2">
               Message <span className="text-red-500">*</span>
             </label>
             <textarea
@@ -226,28 +226,28 @@ export const ContactForm: React.FC = () => {
               value={formData.message}
               onChange={handleChange}
               placeholder="Specify your research scope, sensor layer requirements, or coordination questions..."
-              className={`w-full px-4 py-2.5 rounded-xl border text-sm bg-gray-50/60 dark:bg-[#172330] text-[#18191D] dark:text-[#F3F6F8] dark:placeholder-gray-500 focus:outline-none focus:ring-2 transition-all ${
+              className={`w-full px-4 py-3 rounded-xl border text-base bg-gray-50/60 dark:bg-[#172330] text-[#18191D] dark:text-[#F3F6F8] dark:placeholder-gray-500 focus:outline-none focus:ring-2 transition-all ${
                 errors.message
                   ? 'border-red-400 focus:ring-red-300'
                   : 'border-gray-200 dark:border-[rgba(160,180,195,0.18)] focus:border-[#36C5D9] focus:ring-[#36C5D9]/20'
               }`}
             />
             {errors.message && (
-              <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
-                <AlertCircle className="w-3 h-3" />
+              <p className="text-xs sm:text-sm text-red-500 mt-1 flex items-center gap-1 font-mono">
+                <AlertCircle className="w-3.5 h-3.5" />
                 {errors.message}
               </p>
             )}
           </div>
 
           <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <span className="text-xs text-gray-400 dark:text-[#788796] font-mono">
+            <span className="text-xs sm:text-sm text-gray-500 dark:text-[#AAB5C2] font-mono">
               Direct institutional transmission (Resend configured)
             </span>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-full bg-[#18191D] hover:bg-black dark:bg-[#36C5D9] dark:text-[#0B1118] dark:hover:bg-[#22B8C7] text-white font-medium text-xs uppercase tracking-wider transition-all shadow-sm active:scale-95 disabled:opacity-50 cursor-pointer"
+              className="inline-flex items-center justify-center gap-2.5 px-7 py-3 rounded-full bg-[#18191D] hover:bg-black dark:bg-[#36C5D9] dark:text-[#0B1118] dark:hover:bg-[#22B8C7] text-white font-bold text-sm uppercase tracking-wider transition-all shadow-md active:scale-95 disabled:opacity-50 cursor-pointer"
             >
               {isSubmitting ? (
                 <>
@@ -257,7 +257,7 @@ export const ContactForm: React.FC = () => {
               ) : (
                 <>
                   <span className="pointer-events-none">Submit Inquiry</span>
-                  <Send className="w-3.5 h-3.5 pointer-events-none" />
+                  <Send className="w-4 h-4 pointer-events-none" />
                 </>
               )}
             </button>
