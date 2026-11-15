@@ -1,0 +1,12 @@
+services:
+  after-the-fire:
+    container_name: aetherix-after-the-fire
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        VITE_MAPTILER_API_KEY: ${VITE_MAPTILER_API_KEY:-}
+        VITE_CARTO_BASEMAPS_KEY: ${VITE_CARTO_BASEMAPS_KEY:-cb1_59lw_1_b}
+    ports:
+      - "8080:80"
+    restart: unless-stopped

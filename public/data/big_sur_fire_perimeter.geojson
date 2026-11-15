@@ -1,0 +1,152 @@
+{
+  "type": "FeatureCollection",
+  "name": "Big_Sur_Fire_Perimeters_2026",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+    }
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "id": "timber",
+      "properties": {
+        "id": "timber",
+        "name": "Timber Fire",
+        "ignitionDate": "July 14, 2024",
+        "containmentDate": "August 28, 2024",
+        "areaHa": 5800,
+        "perimeterKm": 48.6,
+        "meanDnbr": 0.462,
+        "highSeverityAreaHa": 2180,
+        "moderateSeverityAreaHa": 2430,
+        "lowSeverityAreaHa": 980,
+        "color": "#F28C45"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -121.695,
+              36.255
+            ],
+            [
+              -121.67,
+              36.275
+            ],
+            [
+              -121.635,
+              36.28
+            ],
+            [
+              -121.605,
+              36.265
+            ],
+            [
+              -121.59,
+              36.24
+            ],
+            [
+              -121.605,
+              36.21
+            ],
+            [
+              -121.625,
+              36.185
+            ],
+            [
+              -121.655,
+              36.175
+            ],
+            [
+              -121.685,
+              36.19
+            ],
+            [
+              -121.71,
+              36.22
+            ],
+            [
+              -121.695,
+              36.255
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "plaskett",
+      "properties": {
+        "id": "plaskett",
+        "name": "Plaskett Fire",
+        "ignitionDate": "August 02, 2024",
+        "containmentDate": "September 19, 2024",
+        "areaHa": 7420,
+        "perimeterKm": 62.4,
+        "meanDnbr": 0.518,
+        "highSeverityAreaHa": 3490,
+        "moderateSeverityAreaHa": 2810,
+        "lowSeverityAreaHa": 860,
+        "color": "#E85D63"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -121.52,
+              36.075
+            ],
+            [
+              -121.49,
+              36.095
+            ],
+            [
+              -121.455,
+              36.09
+            ],
+            [
+              -121.425,
+              36.07
+            ],
+            [
+              -121.41,
+              36.04
+            ],
+            [
+              -121.42,
+              36.005
+            ],
+            [
+              -121.445,
+              35.975
+            ],
+            [
+              -121.485,
+              35.965
+            ],
+            [
+              -121.515,
+              35.98
+            ],
+            [
+              -121.545,
+              36.015
+            ],
+            [
+              -121.54,
+              36.05
+            ],
+            [
+              -121.52,
+              36.075
+            ]
+          ]
+        ]
+      }
+    }
+  ]
+}

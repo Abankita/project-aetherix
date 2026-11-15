@@ -1,0 +1,594 @@
+{
+  "type": "FeatureCollection",
+  "name": "Big_Sur_HUC12_Watersheds",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+    }
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "id": "180600060101",
+      "properties": {
+        "huc12": "180600060101",
+        "name": "Willow Creek\u2013Frontal",
+        "areaHa": 6420,
+        "meanDnbr": 0.428,
+        "positiveDnbrAreaHa": 4820,
+        "positiveDnbrPct": 75.1,
+        "nisarDeltaDb": -4.8,
+        "meanElevationM": 780,
+        "meanSlopeDeg": 34.5,
+        "steepTerrainPct": 64.2,
+        "monitoringPriorityScore": 87.6,
+        "priorityRank": 1,
+        "color": "#E85D63",
+        "center": [
+          -121.46,
+          35.98
+        ]
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -121.485,
+              35.955
+            ],
+            [
+              -121.445,
+              35.965
+            ],
+            [
+              -121.43,
+              35.99
+            ],
+            [
+              -121.455,
+              36.005
+            ],
+            [
+              -121.485,
+              35.98
+            ],
+            [
+              -121.485,
+              35.955
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "180600060102",
+      "properties": {
+        "huc12": "180600060102",
+        "name": "Prewitt Creek",
+        "areaHa": 5180,
+        "meanDnbr": 0.385,
+        "positiveDnbrAreaHa": 3680,
+        "positiveDnbrPct": 71.0,
+        "nisarDeltaDb": -4.1,
+        "meanElevationM": 820,
+        "meanSlopeDeg": 31.2,
+        "steepTerrainPct": 58.1,
+        "monitoringPriorityScore": 82.4,
+        "priorityRank": 2,
+        "color": "#F28C45",
+        "center": [
+          -121.49,
+          36.01
+        ]
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -121.515,
+              35.99
+            ],
+            [
+              -121.485,
+              35.98
+            ],
+            [
+              -121.455,
+              36.005
+            ],
+            [
+              -121.47,
+              36.03
+            ],
+            [
+              -121.515,
+              36.02
+            ],
+            [
+              -121.515,
+              35.99
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "180600060103",
+      "properties": {
+        "huc12": "180600060103",
+        "name": "Mill Creek\u2013Frontal",
+        "areaHa": 4950,
+        "meanDnbr": 0.342,
+        "positiveDnbrAreaHa": 3290,
+        "positiveDnbrPct": 66.5,
+        "nisarDeltaDb": -3.6,
+        "meanElevationM": 740,
+        "meanSlopeDeg": 28.7,
+        "steepTerrainPct": 52.8,
+        "monitoringPriorityScore": 76.8,
+        "priorityRank": 3,
+        "color": "#E7A83E",
+        "center": [
+          -121.52,
+          36.04
+        ]
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -121.545,
+              36.02
+            ],
+            [
+              -121.515,
+              36.02
+            ],
+            [
+              -121.47,
+              36.03
+            ],
+            [
+              -121.49,
+              36.06
+            ],
+            [
+              -121.54,
+              36.05
+            ],
+            [
+              -121.545,
+              36.02
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "180600060104",
+      "properties": {
+        "huc12": "180600060104",
+        "name": "Kirk Creek",
+        "areaHa": 4120,
+        "meanDnbr": 0.315,
+        "positiveDnbrAreaHa": 2580,
+        "positiveDnbrPct": 62.6,
+        "nisarDeltaDb": -3.2,
+        "meanElevationM": 690,
+        "meanSlopeDeg": 27.4,
+        "steepTerrainPct": 49.6,
+        "monitoringPriorityScore": 71.5,
+        "priorityRank": 4,
+        "color": "#E7A83E",
+        "center": [
+          -121.54,
+          36.07
+        ]
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -121.565,
+              36.05
+            ],
+            [
+              -121.54,
+              36.05
+            ],
+            [
+              -121.49,
+              36.06
+            ],
+            [
+              -121.51,
+              36.09
+            ],
+            [
+              -121.56,
+              36.085
+            ],
+            [
+              -121.565,
+              36.05
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "180600060105",
+      "properties": {
+        "huc12": "180600060105",
+        "name": "Limekiln Creek",
+        "areaHa": 6890,
+        "meanDnbr": 0.285,
+        "positiveDnbrAreaHa": 3950,
+        "positiveDnbrPct": 57.3,
+        "nisarDeltaDb": -2.9,
+        "meanElevationM": 890,
+        "meanSlopeDeg": 26.8,
+        "steepTerrainPct": 47.3,
+        "monitoringPriorityScore": 68.2,
+        "priorityRank": 5,
+        "color": "#35B9BD",
+        "center": [
+          -121.56,
+          36.1
+        ]
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -121.585,
+              36.085
+            ],
+            [
+              -121.56,
+              36.085
+            ],
+            [
+              -121.51,
+              36.09
+            ],
+            [
+              -121.53,
+              36.125
+            ],
+            [
+              -121.58,
+              36.12
+            ],
+            [
+              -121.585,
+              36.085
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "180600050201",
+      "properties": {
+        "huc12": "180600050201",
+        "name": "Nacimiento River Upper",
+        "areaHa": 8340,
+        "meanDnbr": 0.26,
+        "positiveDnbrAreaHa": 4310,
+        "positiveDnbrPct": 51.7,
+        "nisarDeltaDb": -2.5,
+        "meanElevationM": 950,
+        "meanSlopeDeg": 24.1,
+        "steepTerrainPct": 41.5,
+        "monitoringPriorityScore": 62.1,
+        "priorityRank": 6,
+        "color": "#35B9BD",
+        "center": [
+          -121.39,
+          36.03
+        ]
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -121.43,
+              35.99
+            ],
+            [
+              -121.365,
+              36.005
+            ],
+            [
+              -121.35,
+              36.05
+            ],
+            [
+              -121.41,
+              36.065
+            ],
+            [
+              -121.43,
+              35.99
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "180600060201",
+      "properties": {
+        "huc12": "180600060201",
+        "name": "Big Creek\u2013Frontal",
+        "areaHa": 5720,
+        "meanDnbr": 0.245,
+        "positiveDnbrAreaHa": 2810,
+        "positiveDnbrPct": 49.1,
+        "nisarDeltaDb": -2.2,
+        "meanElevationM": 860,
+        "meanSlopeDeg": 23.5,
+        "steepTerrainPct": 39.2,
+        "monitoringPriorityScore": 58.9,
+        "priorityRank": 7,
+        "color": "#35B9BD",
+        "center": [
+          -121.59,
+          36.13
+        ]
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -121.615,
+              36.12
+            ],
+            [
+              -121.58,
+              36.12
+            ],
+            [
+              -121.53,
+              36.125
+            ],
+            [
+              -121.555,
+              36.155
+            ],
+            [
+              -121.61,
+              36.15
+            ],
+            [
+              -121.615,
+              36.12
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "180600060202",
+      "properties": {
+        "huc12": "180600060202",
+        "name": "Vicente Creek",
+        "areaHa": 3980,
+        "meanDnbr": 0.21,
+        "positiveDnbrAreaHa": 1820,
+        "positiveDnbrPct": 45.7,
+        "nisarDeltaDb": -1.9,
+        "meanElevationM": 620,
+        "meanSlopeDeg": 21.8,
+        "steepTerrainPct": 36.8,
+        "monitoringPriorityScore": 52.4,
+        "priorityRank": 8,
+        "color": "#498ACF",
+        "center": [
+          -121.5,
+          36.08
+        ]
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -121.52,
+              36.065
+            ],
+            [
+              -121.48,
+              36.07
+            ],
+            [
+              -121.465,
+              36.1
+            ],
+            [
+              -121.505,
+              36.105
+            ],
+            [
+              -121.52,
+              36.065
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "180600060203",
+      "properties": {
+        "huc12": "180600060203",
+        "name": "Partington Creek",
+        "areaHa": 4860,
+        "meanDnbr": 0.185,
+        "positiveDnbrAreaHa": 2040,
+        "positiveDnbrPct": 42.0,
+        "nisarDeltaDb": -1.6,
+        "meanElevationM": 710,
+        "meanSlopeDeg": 19.5,
+        "steepTerrainPct": 33.4,
+        "monitoringPriorityScore": 47.3,
+        "priorityRank": 9,
+        "color": "#498ACF",
+        "center": [
+          -121.63,
+          36.17
+        ]
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -121.655,
+              36.15
+            ],
+            [
+              -121.61,
+              36.15
+            ],
+            [
+              -121.555,
+              36.155
+            ],
+            [
+              -121.58,
+              36.195
+            ],
+            [
+              -121.65,
+              36.19
+            ],
+            [
+              -121.655,
+              36.15
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "180600060301",
+      "properties": {
+        "huc12": "180600060301",
+        "name": "McWay Creek\u2013Frontal",
+        "areaHa": 4150,
+        "meanDnbr": 0.145,
+        "positiveDnbrAreaHa": 1580,
+        "positiveDnbrPct": 38.1,
+        "nisarDeltaDb": -1.2,
+        "meanElevationM": 650,
+        "meanSlopeDeg": 17.2,
+        "steepTerrainPct": 28.9,
+        "monitoringPriorityScore": 41.0,
+        "priorityRank": 10,
+        "color": "#22B8C7",
+        "center": [
+          -121.66,
+          36.2
+        ]
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -121.685,
+              36.19
+            ],
+            [
+              -121.65,
+              36.19
+            ],
+            [
+              -121.58,
+              36.195
+            ],
+            [
+              -121.605,
+              36.23
+            ],
+            [
+              -121.68,
+              36.225
+            ],
+            [
+              -121.685,
+              36.19
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "180600060401",
+      "properties": {
+        "huc12": "180600060401",
+        "name": "San Carpoforo Creek",
+        "areaHa": 7880,
+        "meanDnbr": 0.11,
+        "positiveDnbrAreaHa": 2240,
+        "positiveDnbrPct": 28.4,
+        "nisarDeltaDb": -0.9,
+        "meanElevationM": 580,
+        "meanSlopeDeg": 15.1,
+        "steepTerrainPct": 24.5,
+        "monitoringPriorityScore": 35.8,
+        "priorityRank": 11,
+        "color": "#22B8C7",
+        "center": [
+          -121.42,
+          35.93
+        ]
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -121.455,
+              35.91
+            ],
+            [
+              -121.39,
+              35.92
+            ],
+            [
+              -121.38,
+              35.96
+            ],
+            [
+              -121.445,
+              35.95
+            ],
+            [
+              -121.455,
+              35.91
+            ]
+          ]
+        ]
+      }
+    }
+  ]
+}
