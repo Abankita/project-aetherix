@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { InteractiveMap } from '@/components/maps/InteractiveMap';
-import { StatisticsService } from '@/services/statisticsService';
+import { aetherixApi, FireSummary, RasterLayer } from '@/services/aetherixApi';
 import {
   Flame,
   Layers,
@@ -12,9 +12,43 @@ export const DashboardFiresPage: React.FC = () => {
   const [showWatersheds, setShowWatersheds] = useState<boolean>(true);
   const [showTerrain, setShowTerrain] = useState<boolean>(true);
   const [showSatelliteUnderlay, setShowSatelliteUnderlay] = useState<boolean>(false);
+  const [availableLayers, setAvailableLayers] = useState<RasterLayer[]>([]);
+  const [activeLayerId, setActiveLayerId] = useState('');
+  const [rasterOpacity, setRasterOpacity] = useState(0.78);
+  const [summaries, setSummaries] = useState<Partial<Record<'timber' | 'plaskett', FireSummary>>>({});
+  const [dataError, setDataError] = useState('');
 
-  const stats = StatisticsService.getFireStatistics();
-  const currentFireStats = selectedFire === 'all' ? null : stats[selectedFire];
+  useEffect(() => {
+    let alive = true;
+    Promise.all([aetherixApi.summary('timber'), aetherixApi.summary('plaskett')])
+      .then(([timber, plaskett]) => alive && setSummaries({ timber, plaskett }))
+      .catch((error: Error) => alive && setDataError(`Processed summaries unavailable: ${error.message}`));
+    return () => { alive = false; };
+  }, []);
+
+  useEffect(() => {
+    let alive = true;
+    if (selectedFire === 'all') {
+      setAvailableLayers([]);
+      setActiveLayerId('');
+      return;
+    }
+    Promise.all([aetherixApi.layers(selectedFire), aetherixApi.summary(selectedFire)])
+      .then(([layerResponse, summary]) => {
+        if (!alive) return;
+        setAvailableLayers(layerResponse.layers);
+        setActiveLayerId((current) => current && layerResponse.layers.some((layer) => layer.id === current)
+          ? current
+          : layerResponse.layers.find((layer) => layer.id.endsWith('_screening_score'))?.id || layerResponse.layers.find((layer) => layer.id.endsWith('_dnbr'))?.id || '');
+        setSummaries((current) => ({ ...current, [selectedFire]: summary }));
+        setDataError('');
+      })
+      .catch((error: Error) => alive && setDataError(`Processed fire data unavailable: ${error.message}`));
+    return () => { alive = false; };
+  }, [selectedFire]);
+
+  const selectedSummary = selectedFire === 'all' ? null : summaries[selectedFire];
+  const activeRaster = availableLayers.find((layer) => layer.id === activeLayerId) || null;
 
   return (
     <div className="w-full px-4 sm:px-6 lg:px-8 py-8 max-w-7xl mx-auto space-y-6">
@@ -120,7 +154,18 @@ export const DashboardFiresPage: React.FC = () => {
         <div className="text-xs font-mono text-[#626873] dark:text-[#AAB5C2] hidden md:block">
           Click polygon on map or pills above to isolate fire
         </div>
+        {selectedFire !== 'all' && availableLayers.length > 0 && (
+          <div className="flex items-center gap-2 text-xs font-mono">
+            <label htmlFor="processed-layer" className="text-gray-500 dark:text-[#AAB5C2]">Processed raster</label>
+            <select id="processed-layer" value={activeLayerId} onChange={(event) => setActiveLayerId(event.target.value)} className="max-w-64 px-2 py-1.5 rounded-lg bg-gray-100 dark:bg-[#172330] text-[#18191D] dark:text-[#F3F6F8] border border-gray-200 dark:border-gray-700">
+              {availableLayers.map((layer) => <option key={layer.id} value={layer.id}>[{layer.category}] {layer.name}</option>)}
+            </select>
+            <input aria-label="Raster opacity" type="range" min="0" max="1" step="0.05" value={rasterOpacity} onChange={(event) => setRasterOpacity(Number(event.target.value))} />
+          </div>
+        )}
       </div>
+
+      {dataError && <div role="status" className="text-xs text-amber-700 dark:text-amber-300">{dataError}. Start the backend to load the processed layers.</div>}
 
       {/* Main Interactive Map */}
       <InteractiveMap
@@ -129,8 +174,22 @@ export const DashboardFiresPage: React.FC = () => {
         showWatersheds={showWatersheds}
         showSatellite={showSatelliteUnderlay}
         onSelectFire={(id) => setSelectedFire(id)}
+        rasterLayer={activeRaster}
+        rasterOpacity={rasterOpacity}
       />
 
+      {selectedSummary && (
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4" aria-live="polite">
+          {[
+            ['AOI pixels', selectedSummary.aoi_pixels.toLocaleString()],
+            ['Common valid pixels', selectedSummary.common_valid_score_pixels.toLocaleString()],
+            ['Valid coverage', `${selectedSummary.common_valid_score_percent.toFixed(2)}%`],
+            ['Mean screening index', selectedSummary.screening_score.mean.toFixed(2)],
+          ].map(([label, value]) => <div key={label} className="p-4 rounded-xl bg-white dark:bg-[#111C28] border border-gray-200 dark:border-gray-800"><div className="text-[11px] font-mono uppercase text-gray-400 dark:text-[#788796]">{label}</div><div className="text-xl font-bold mt-1 font-mono text-[#18191D] dark:text-[#F3F6F8]">{value}</div></div>)}
+        </div>
+      )}
+
+      {selectedSummary && <p className="max-w-4xl text-sm leading-relaxed text-[#626873] dark:text-[#AAB5C2]">These are map-grid counts for {selectedSummary.name}, not hectares. “Valid coverage” is the share of the fire study grid with usable values across the combined score inputs. Mean dNBR summarizes the optical change layer; it is not a percent burned or a field-verified severity class.</p>}
       {/* Dynamic Information Panel Based on Selection */}
       {selectedFire === 'all' ? (
         /* Summary Grid for Both Fires */
@@ -138,51 +197,48 @@ export const DashboardFiresPage: React.FC = () => {
           {/* Timber Fire Card */}
           <div
             onClick={() => setSelectedFire('timber')}
-            className="p-6 rounded-2xl bg-white dark:bg-[#111C28] border border-gray-200/80 dark:border-[rgba(160,180,195,0.14)] shadow-xs hover:border-[#F28C45] transition-all cursor-pointer group space-y-4"
+            className="p-6 rounded-2xl bg-white dark:bg-[#111C28] shadow-xs transition-all cursor-pointer group space-y-4"
           >
             <div className="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-800">
               <div className="flex items-center gap-2">
                 <span className="w-3 h-3 rounded-full bg-[#F28C45]"></span>
                 <h3 className="font-bold text-lg text-[#18191D] dark:text-[#F3F6F8] group-hover:text-[#F28C45] transition-colors">
-                  {stats.timber.name}
+                  Timber Fire
                 </h3>
               </div>
               <span className="text-xs font-mono font-semibold text-[#F28C45] bg-orange-50 dark:bg-[#172330] px-2.5 py-1 rounded-full">
-                5,800 HECTARES
+                {summaries.timber ? `${summaries.timber.aoi_pixels.toLocaleString()} AOI PIXELS` : 'LOADING SUMMARY'}
               </span>
             </div>
 
             <div className="grid grid-cols-2 gap-4 text-xs font-mono">
               <div>
                 <span className="text-gray-400 dark:text-[#788796] block text-[10px]">Ignition Date</span>
-                <span className="text-gray-800 dark:text-[#F3F6F8] font-medium">{stats.timber.ignition}</span>
+                <span className="text-gray-800 dark:text-[#F3F6F8] font-medium">{summaries.timber?.ignition_date || 'Loading processing summary'}</span>
               </div>
               <div>
-                <span className="text-gray-400 dark:text-[#788796] block text-[10px]">Containment</span>
-                <span className="text-gray-800 dark:text-[#F3F6F8] font-medium">{stats.timber.containment}</span>
+                  <span className="text-gray-400 dark:text-[#788796] block text-[10px]">Valid data coverage</span>
+                <span className="text-gray-800 dark:text-[#F3F6F8] font-medium">{summaries.timber ? `${summaries.timber.common_valid_score_percent.toFixed(1)}%` : '—'}</span>
               </div>
               <div>
                 <span className="text-gray-400 dark:text-[#788796] block text-[10px]">Mean dNBR</span>
-                <span className="text-gray-800 dark:text-[#F3F6F8] font-semibold">{stats.timber.meanDnbr}</span>
+                <span className="text-gray-800 dark:text-[#F3F6F8] font-semibold">{summaries.timber?.dNBR.mean.toFixed(3) ?? '—'}</span>
               </div>
               <div>
-                <span className="text-gray-400 dark:text-[#788796] block text-[10px]">Canopy Loss</span>
-                <span className="text-[#F06468] font-semibold">{stats.timber.canopyLossPct}%</span>
+                  <span className="text-gray-400 dark:text-[#788796] block text-[10px]">Mean NDVI loss</span>
+                <span className="text-[#F06468] font-semibold">{summaries.timber?.NDVI_loss.mean.toFixed(3) ?? '—'}</span>
               </div>
             </div>
 
             <div className="space-y-1.5 pt-2">
-              <span className="text-xs font-mono uppercase text-gray-400 dark:text-[#788796]">Severity Distribution</span>
+              <span className="text-xs font-mono uppercase text-gray-400 dark:text-[#788796]">Processed dNBR statistics · not field-calibrated severity</span>
               <div className="w-full h-3 rounded-full overflow-hidden flex bg-gray-100 dark:bg-gray-800">
-                <div style={{ width: `${stats.timber.severityBreakdown.high}%` }} className="bg-[#F06468]" title="High" />
-                <div style={{ width: `${stats.timber.severityBreakdown.moderate}%` }} className="bg-[#F28C45]" title="Moderate" />
-                <div style={{ width: `${stats.timber.severityBreakdown.low}%` }} className="bg-[#E9B75C]" title="Low" />
-                <div style={{ width: `${stats.timber.severityBreakdown.unburned}%` }} className="bg-[#43C99A]" title="Unburned" />
+                <div className="h-full bg-[#F28C45]" style={{ width: `${summaries.timber ? Math.max(0, Math.min(100, summaries.timber.common_valid_score_percent)) : 0}%` }} title="Common valid data coverage" />
               </div>
               <div className="flex justify-between text-[10px] font-mono text-gray-500 dark:text-[#AAB5C2]">
-                <span>High: {stats.timber.severityBreakdown.high}%</span>
-                <span>Mod: {stats.timber.severityBreakdown.moderate}%</span>
-                <span>Low: {stats.timber.severityBreakdown.low}%</span>
+                <span>Mean: {summaries.timber?.dNBR.mean.toFixed(3) ?? '—'}</span>
+                <span>Median: {summaries.timber?.dNBR.median.toFixed(3) ?? '—'}</span>
+                <span>Valid: {summaries.timber?.dNBR.valid_pixels.toLocaleString() ?? '—'} px</span>
               </div>
             </div>
 
@@ -194,51 +250,48 @@ export const DashboardFiresPage: React.FC = () => {
           {/* Plaskett Fire Card */}
           <div
             onClick={() => setSelectedFire('plaskett')}
-            className="p-6 rounded-2xl bg-white dark:bg-[#111C28] border border-gray-200/80 dark:border-[rgba(160,180,195,0.14)] shadow-xs hover:border-[#F06468] transition-all cursor-pointer group space-y-4"
+            className="p-6 rounded-2xl bg-white dark:bg-[#111C28] shadow-xs transition-all cursor-pointer group space-y-4"
           >
             <div className="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-800">
               <div className="flex items-center gap-2">
                 <span className="w-3 h-3 rounded-full bg-[#F06468]"></span>
                 <h3 className="font-bold text-lg text-[#18191D] dark:text-[#F3F6F8] group-hover:text-[#F06468] transition-colors">
-                  {stats.plaskett.name}
+                  Plaskett Fire
                 </h3>
               </div>
               <span className="text-xs font-mono font-semibold text-[#F06468] bg-red-50 dark:bg-[#172330] px-2.5 py-1 rounded-full">
-                7,420 HECTARES
+                {summaries.plaskett ? `${summaries.plaskett.aoi_pixels.toLocaleString()} AOI PIXELS` : 'LOADING SUMMARY'}
               </span>
             </div>
 
             <div className="grid grid-cols-2 gap-4 text-xs font-mono">
               <div>
                 <span className="text-gray-400 dark:text-[#788796] block text-[10px]">Ignition Date</span>
-                <span className="text-gray-800 dark:text-[#F3F6F8] font-medium">{stats.plaskett.ignition}</span>
+                <span className="text-gray-800 dark:text-[#F3F6F8] font-medium">{summaries.plaskett?.ignition_date || 'Loading processing summary'}</span>
               </div>
               <div>
-                <span className="text-gray-400 dark:text-[#788796] block text-[10px]">Containment</span>
-                <span className="text-gray-800 dark:text-[#F3F6F8] font-medium">{stats.plaskett.containment}</span>
+                  <span className="text-gray-400 dark:text-[#788796] block text-[10px]">Valid data coverage</span>
+                <span className="text-gray-800 dark:text-[#F3F6F8] font-medium">{summaries.plaskett ? `${summaries.plaskett.common_valid_score_percent.toFixed(1)}%` : '—'}</span>
               </div>
               <div>
                 <span className="text-gray-400 dark:text-[#788796] block text-[10px]">Mean dNBR</span>
-                <span className="text-gray-800 dark:text-[#F3F6F8] font-semibold">{stats.plaskett.meanDnbr}</span>
+                <span className="text-gray-800 dark:text-[#F3F6F8] font-semibold">{summaries.plaskett?.dNBR.mean.toFixed(3) ?? '—'}</span>
               </div>
               <div>
-                <span className="text-gray-400 dark:text-[#788796] block text-[10px]">Canopy Loss</span>
-                <span className="text-[#F06468] font-semibold">{stats.plaskett.canopyLossPct}%</span>
+                  <span className="text-gray-400 dark:text-[#788796] block text-[10px]">Mean NDVI loss</span>
+                <span className="text-[#F06468] font-semibold">{summaries.plaskett?.NDVI_loss.mean.toFixed(3) ?? '—'}</span>
               </div>
             </div>
 
             <div className="space-y-1.5 pt-2">
-              <span className="text-xs font-mono uppercase text-gray-400 dark:text-[#788796]">Severity Distribution</span>
+              <span className="text-xs font-mono uppercase text-gray-400 dark:text-[#788796]">Processed dNBR statistics · not field-calibrated severity</span>
               <div className="w-full h-3 rounded-full overflow-hidden flex bg-gray-100 dark:bg-gray-800">
-                <div style={{ width: `${stats.plaskett.severityBreakdown.high}%` }} className="bg-[#F06468]" title="High" />
-                <div style={{ width: `${stats.plaskett.severityBreakdown.moderate}%` }} className="bg-[#F28C45]" title="Moderate" />
-                <div style={{ width: `${stats.plaskett.severityBreakdown.low}%` }} className="bg-[#E9B75C]" title="Low" />
-                <div style={{ width: `${stats.plaskett.severityBreakdown.unburned}%` }} className="bg-[#43C99A]" title="Unburned" />
+                <div className="h-full bg-[#F06468]" style={{ width: `${summaries.plaskett ? Math.max(0, Math.min(100, summaries.plaskett.common_valid_score_percent)) : 0}%` }} title="Common valid data coverage" />
               </div>
               <div className="flex justify-between text-[10px] font-mono text-gray-500 dark:text-[#AAB5C2]">
-                <span>High: {stats.plaskett.severityBreakdown.high}%</span>
-                <span>Mod: {stats.plaskett.severityBreakdown.moderate}%</span>
-                <span>Low: {stats.plaskett.severityBreakdown.low}%</span>
+                <span>Mean: {summaries.plaskett?.dNBR.mean.toFixed(3) ?? '—'}</span>
+                <span>Median: {summaries.plaskett?.dNBR.median.toFixed(3) ?? '—'}</span>
+                <span>Valid: {summaries.plaskett?.dNBR.valid_pixels.toLocaleString() ?? '—'} px</span>
               </div>
             </div>
 
@@ -249,7 +302,7 @@ export const DashboardFiresPage: React.FC = () => {
         </div>
       ) : (
         /* Detailed Selected Fire Inspection Panel */
-        currentFireStats && (
+        selectedSummary && (
           <div className="p-8 rounded-3xl bg-white dark:bg-[#111C28] border border-gray-200/90 dark:border-[rgba(160,180,195,0.14)] shadow-sm space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-gray-200 dark:border-gray-800">
               <div className="flex items-center gap-3">
@@ -262,10 +315,10 @@ export const DashboardFiresPage: React.FC = () => {
                 </div>
                 <div>
                   <h2 className="text-2xl font-extrabold text-[#18191D] dark:text-[#F3F6F8]">
-                    {currentFireStats.name} Telemetry &amp; Impact
+                    {selectedSummary.name} Processed Data Summary
                   </h2>
                   <div className="text-xs font-mono text-[#626873] dark:text-[#AAB5C2]">
-                    {currentFireStats.ignition} · {currentFireStats.containment}
+                    Processing ignition reference: {selectedSummary.ignition_date} · 20 m analysis grid, {selectedSummary.crs}
                   </div>
                 </div>
               </div>
@@ -280,37 +333,37 @@ export const DashboardFiresPage: React.FC = () => {
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               <div className="p-4 rounded-xl bg-gray-50 dark:bg-[#172330] border border-gray-100 dark:border-[rgba(160,180,195,0.12)]">
-                <div className="text-xs font-mono uppercase text-gray-400 dark:text-[#788796]">Burn Footprint</div>
+                <div className="text-xs font-mono uppercase text-gray-400 dark:text-[#788796]">AOI Grid Pixels</div>
                 <div className="text-xl font-extrabold text-[#18191D] dark:text-[#F3F6F8] mt-1 font-mono">
-                  {currentFireStats.hectares.toLocaleString()} ha
+                  {selectedSummary.aoi_pixels.toLocaleString()}
                 </div>
                 <div className="text-[11px] text-gray-500 dark:text-[#AAB5C2] font-mono mt-0.5">
-                  ({currentFireStats.acres.toLocaleString()} acres)
+                  Analysis grid {selectedSummary.grid_width} × {selectedSummary.grid_height}
                 </div>
               </div>
 
               <div className="p-4 rounded-xl bg-gray-50 dark:bg-[#172330] border border-gray-100 dark:border-[rgba(160,180,195,0.12)]">
-                <div className="text-xs font-mono uppercase text-gray-400 dark:text-[#788796]">Perimeter Length</div>
+                <div className="text-xs font-mono uppercase text-gray-400 dark:text-[#788796]">Valid Pixels</div>
                 <div className="text-xl font-extrabold text-[#18191D] dark:text-[#F3F6F8] mt-1 font-mono">
-                  {currentFireStats.perimeterKm} km
+                  {selectedSummary.common_valid_score_pixels.toLocaleString()}
                 </div>
-                <div className="text-[11px] text-gray-500 dark:text-[#AAB5C2] font-mono mt-0.5">Vector Perimeter</div>
+                <div className="text-[11px] text-gray-500 dark:text-[#AAB5C2] font-mono mt-0.5">Common score coverage</div>
               </div>
 
               <div className="p-4 rounded-xl bg-gray-50 dark:bg-[#172330] border border-gray-100 dark:border-[rgba(160,180,195,0.12)]">
                 <div className="text-xs font-mono uppercase text-gray-400 dark:text-[#788796]">Mean dNBR</div>
                 <div className="text-xl font-extrabold text-[#F28C45] mt-1 font-mono">
-                  {currentFireStats.meanDnbr}
+                  {selectedSummary.dNBR.mean.toFixed(3)}
                 </div>
                 <div className="text-[11px] text-gray-500 dark:text-[#AAB5C2] font-mono mt-0.5">
-                  Max: {currentFireStats.maxDnbr}
+                  Median: {selectedSummary.dNBR.median.toFixed(3)}
                 </div>
               </div>
 
               <div className="p-4 rounded-xl bg-gray-50 dark:bg-[#172330] border border-gray-100 dark:border-[rgba(160,180,195,0.12)]">
-                <div className="text-xs font-mono uppercase text-gray-400 dark:text-[#788796]">Total Canopy Loss</div>
+                <div className="text-xs font-mono uppercase text-gray-400 dark:text-[#788796]">Common Valid Coverage</div>
                 <div className="text-xl font-extrabold text-[#F06468] mt-1 font-mono">
-                  {currentFireStats.canopyLossPct}%
+                  {selectedSummary.common_valid_score_percent.toFixed(2)}%
                 </div>
                 <div className="text-[11px] text-gray-500 dark:text-[#AAB5C2] font-mono mt-0.5">Stand Replacement</div>
               </div>
@@ -322,7 +375,11 @@ export const DashboardFiresPage: React.FC = () => {
                 Key Spatial &amp; Geomorphic Findings
               </h4>
               <div className="space-y-2">
-                {currentFireStats.keyFindings.map((finding, idx) => (
+                {[
+                  `Mean relative screening index: ${selectedSummary.screening_score.mean.toFixed(2)} (not a probability).`,
+                  `Mean NDVI loss: ${selectedSummary.NDVI_loss.mean.toFixed(3)}; mean NDMI loss: ${selectedSummary.NDMI_loss.mean.toFixed(3)}.`,
+                  `Mean NISAR HH/HV change: ${selectedSummary.NISAR_HH_change.mean.toFixed(2)} / ${selectedSummary.NISAR_HV_change.mean.toFixed(2)} dB (provisional backscatter change).`,
+                ].map((finding, idx) => (
                   <div
                     key={idx}
                     className="p-3.5 rounded-xl bg-gray-50/70 dark:bg-[#172330] border border-gray-200/60 dark:border-[rgba(160,180,195,0.12)] text-xs text-[#18191D] dark:text-[#F3F6F8] flex items-start gap-2.5"
@@ -344,16 +401,16 @@ export const DashboardFiresPage: React.FC = () => {
             <div className="flex items-center gap-2 text-xs font-mono uppercase text-gray-400 dark:text-[#788796]">
               <span>TEMPORAL OBSERVATION ORBIT</span>
               <span className="w-1.5 h-1.5 rounded-full bg-[#36C5D9]"></span>
-              <span className="text-[#626873] dark:text-[#AAB5C2]">SUMMER / FALL 2026 CAMPAIGN</span>
+              <span className="text-[#626873] dark:text-[#AAB5C2]">SUPPLIED PROCESSING PHASES</span>
             </div>
             <h3 className="text-xl font-extrabold text-[#18191D] dark:text-[#F3F6F8] mt-1">Acquisition Timeline</h3>
           </div>
 
           <div className="flex items-center gap-3 bg-[#ECEEF2] dark:bg-[#172330] p-1 rounded-full self-start md:self-auto text-xs font-mono">
             <span className="px-3 py-1 bg-white dark:bg-[#111C28] rounded-full text-[#18191D] dark:text-[#F3F6F8] shadow-2xs font-semibold">
-              &lt;15% CLOUD COVER FILTER
+              PRE / DURING / POST COMPOSITES
             </span>
-            <span className="text-gray-500 dark:text-[#AAB5C2] px-2 font-medium">60 TOTAL PASSES</span>
+              <span className="text-gray-500 dark:text-[#AAB5C2] px-2 font-medium">DATES AND PASS COUNTS NOT PROVIDED</span>
           </div>
         </div>
 
@@ -368,26 +425,24 @@ export const DashboardFiresPage: React.FC = () => {
                 </div>
                 <div>
                   <span className="text-[10px] font-mono uppercase text-gray-400 dark:text-[#788796] block">
-                    BASELINE REGISTRATION
+                    PRE-FIRE PHASE
                   </span>
                   <h4 className="font-bold text-sm text-[#18191D] dark:text-[#F3F6F8]">Pre-Fire Period</h4>
                 </div>
               </div>
 
               <div className="text-xs font-mono font-bold text-[#18191D] dark:text-[#36C5D9]">
-                15 July – 07 August 2026
+                Pre-fire composite; date not supplied
               </div>
 
               <p className="text-xs text-[#626873] dark:text-[#AAB5C2] leading-relaxed">
-                Initial BOA radiometry collection. 20 cloud-free Sentinel-2 MSI tiles establishing
-                pre-ignition NDVI/NBR vegetative moisture indexes across dense Redwood/Chaparral
-                drainages.
+                Sentinel-2 pre-fire layers provide a reference for comparing vegetation and burn-index values with later phases. The package does not list acquisition dates or scene totals.
               </p>
             </div>
 
             <div className="pt-3 border-t border-gray-200/60 dark:border-gray-800 text-[11px] font-mono text-gray-500 dark:text-[#788796] flex justify-between">
               <span>Sentinel-2 MSI</span>
-              <span className="text-emerald-600 dark:text-[#43C99A] font-semibold">20 Scenes Calibrated</span>
+              <span className="text-emerald-600 dark:text-[#43C99A] font-semibold">Pre-fire phase data</span>
             </div>
           </div>
 
@@ -400,25 +455,24 @@ export const DashboardFiresPage: React.FC = () => {
                 </div>
                 <div>
                   <span className="text-[10px] font-mono uppercase text-gray-400 dark:text-[#788796] block">
-                    ACTIVE IGNITION ORBIT
+                    DURING-FIRE PHASE
                   </span>
                   <h4 className="font-bold text-sm text-[#18191D] dark:text-[#F3F6F8]">Fire Period</h4>
                 </div>
               </div>
 
               <div className="text-xs font-mono font-bold text-[#F28C45]">
-                08 August – 05 September 2026
+              During-fire phase; date not supplied
               </div>
 
               <p className="text-xs text-[#626873] dark:text-[#AAB5C2] leading-relaxed">
-                Dual fire propagation. NISAR L-band SAR backscatter acquisition penetrated dense
-                marine smoke plumes, revealing sub-canopy thermal progression along coastal ridges.
+                The supplied optical and provisional radar summaries include a during-fire phase. These aggregates do not provide a dated fire-progression track.
               </p>
             </div>
 
             <div className="pt-3 border-t border-gray-200/60 dark:border-gray-800 text-[11px] font-mono text-gray-500 dark:text-[#788796] flex justify-between">
               <span>NISAR SAR (L-Band)</span>
-              <span className="text-[#F28C45] font-semibold">Active Run Tracking</span>
+              <span className="text-[#F28C45] font-semibold">Phase summary available</span>
             </div>
           </div>
 
@@ -438,18 +492,17 @@ export const DashboardFiresPage: React.FC = () => {
               </div>
 
               <div className="text-xs font-mono font-bold text-[#18191D] dark:text-[#6599E8]">
-                06 September – 30 October 2026
+                Post-fire phase; date not supplied
               </div>
 
               <p className="text-xs text-[#626873] dark:text-[#AAB5C2] leading-relaxed">
-                34 clean post-fire passes ingested. Differential dNBR computation and radar
-                depolarization delta calculated across all 11 watershed basins.
+                The post-fire layers support optical and radar change comparisons. dNBR is a spectral indicator and has not been calibrated here against field severity measurements.
               </p>
             </div>
 
             <div className="pt-3 border-t border-gray-200/60 dark:border-gray-800 text-[11px] font-mono text-gray-500 dark:text-[#788796] flex justify-between">
               <span>S2 + NISAR Fusion</span>
-              <span className="text-[#6599E8] font-semibold">34 Scenes Ingested</span>
+              <span className="text-[#6599E8] font-semibold">Post-fire phase data</span>
             </div>
           </div>
         </div>

@@ -1,0 +1,654 @@
+{
+  "project": "AETHERIX",
+  "version": "2.0",
+  "generated_utc": "2026-11-16T02:39:52.931556+00:00",
+  "analysis_crs": "EPSG:32610",
+  "web_crs": "EPSG:4326",
+  "analysis_resolution_m": 20,
+  "fires": {
+    "timber": {
+      "name": "Timber Fire",
+      "ignition_date": "2026-08-08",
+      "crs": "EPSG:32610",
+      "resolution_m": 20,
+      "grid_width": 763,
+      "grid_height": 623,
+      "aoi_pixels": 257489,
+      "common_valid_score_pixels": 256495,
+      "common_valid_score_percent": 99.61,
+      "screening_score": {
+        "valid_pixels": 256495,
+        "min": 0.0,
+        "max": 100.0,
+        "mean": 44.71983337402344,
+        "median": 43.85712814331055
+      },
+      "dNBR": {
+        "valid_pixels": 257403,
+        "min": -0.36497020721435547,
+        "max": 1.4282562732696533,
+        "mean": 0.5141764283180237,
+        "median": 0.49021264910697937
+      },
+      "NDVI_loss": {
+        "valid_pixels": 257403,
+        "min": -0.3778272271156311,
+        "max": 0.8688362836837769,
+        "mean": 0.32102012634277344,
+        "median": 0.321424275636673
+      },
+      "NDMI_loss": {
+        "valid_pixels": 257403,
+        "min": -0.16056984663009644,
+        "max": 1.127577543258667,
+        "mean": 0.367760568857193,
+        "median": 0.3521174490451813
+      },
+      "NISAR_HH_change": {
+        "valid_pixels": 256581,
+        "min": -7.225142478942871,
+        "max": 9.769500732421875,
+        "mean": 0.38814085721969604,
+        "median": 0.3994112014770508
+      },
+      "NISAR_HV_change": {
+        "valid_pixels": 256581,
+        "min": -9.899063110351562,
+        "max": 8.364801406860352,
+        "mean": -0.1572154015302658,
+        "median": -0.02546405792236328
+      }
+    },
+    "plaskett": {
+      "name": "Plaskett Fire",
+      "ignition_date": "2026-08-26",
+      "crs": "EPSG:32610",
+      "resolution_m": 20,
+      "grid_width": 758,
+      "grid_height": 613,
+      "aoi_pixels": 303457,
+      "common_valid_score_pixels": 302911,
+      "common_valid_score_percent": 99.82,
+      "screening_score": {
+        "valid_pixels": 302911,
+        "min": 0.0,
+        "max": 99.66858673095703,
+        "mean": 45.06188201904297,
+        "median": 45.24155807495117
+      },
+      "dNBR": {
+        "valid_pixels": 303457,
+        "min": -0.20128661394119263,
+        "max": 1.2896603345870972,
+        "mean": 0.4863613247871399,
+        "median": 0.4779402017593384
+      },
+      "NDVI_loss": {
+        "valid_pixels": 303457,
+        "min": -0.19841909408569336,
+        "max": 0.8244004249572754,
+        "mean": 0.34021151065826416,
+        "median": 0.3556765913963318
+      },
+      "NDMI_loss": {
+        "valid_pixels": 303457,
+        "min": -0.15317237377166748,
+        "max": 0.9603487849235535,
+        "mean": 0.29780659079551697,
+        "median": 0.29443731904029846
+      },
+      "NISAR_HH_change": {
+        "valid_pixels": 302911,
+        "min": -11.6873197555542,
+        "max": 9.771312713623047,
+        "mean": -1.1599820852279663,
+        "median": -0.7941160202026367
+      },
+      "NISAR_HV_change": {
+        "valid_pixels": 302911,
+        "min": -13.196380615234375,
+        "max": 5.2663068771362305,
+        "mean": -1.9753708839416504,
+        "median": -1.3795433044433594
+      }
+    }
+  },
+  "layers": [
+    {
+      "id": "timber_dnbr_gee_source",
+      "fire": "timber",
+      "name": "dNBR_GEE_source",
+      "description": "Original GEE dNBR export",
+      "category": "Sentinel-2",
+      "path": "timber/integrated/dnbr_gee_source.tif",
+      "format": "GeoTIFF",
+      "crs": "EPSG:32610",
+      "resolution_m": 20,
+      "units": "unitless",
+      "colormap": "RdYlGn",
+      "display_min": 0.027228079736232758,
+      "display_max": 1.1005818843841553,
+      "statistics": {
+        "valid_pixels": 257403,
+        "min": -0.36497020721435547,
+        "max": 1.4282562732696533,
+        "mean": 0.5141764283180237,
+        "median": 0.49021264910697937
+      }
+    },
+    {
+      "id": "timber_dnbr",
+      "fire": "timber",
+      "name": "dNBR",
+      "description": "Aligned pre-fire NBR minus post-fire NBR",
+      "category": "Sentinel-2",
+      "path": "timber/integrated/dnbr.tif",
+      "format": "GeoTIFF",
+      "crs": "EPSG:32610",
+      "resolution_m": 20,
+      "units": "unitless",
+      "colormap": "RdYlGn",
+      "display_min": 0.027228079736232758,
+      "display_max": 1.1005818843841553,
+      "statistics": {
+        "valid_pixels": 257403,
+        "min": -0.36497020721435547,
+        "max": 1.4282562732696533,
+        "mean": 0.5141764283180237,
+        "median": 0.49021264910697937
+      }
+    },
+    {
+      "id": "timber_ndvi_loss",
+      "fire": "timber",
+      "name": "NDVI_loss",
+      "description": "Pre-fire NDVI minus post-fire NDVI",
+      "category": "Sentinel-2",
+      "path": "timber/integrated/ndvi_loss.tif",
+      "format": "GeoTIFF",
+      "crs": "EPSG:32610",
+      "resolution_m": 20,
+      "units": "unitless",
+      "colormap": "RdYlGn",
+      "display_min": -0.012434878386557102,
+      "display_max": 0.70356285572052,
+      "statistics": {
+        "valid_pixels": 257403,
+        "min": -0.3778272271156311,
+        "max": 0.8688362836837769,
+        "mean": 0.32102012634277344,
+        "median": 0.321424275636673
+      }
+    },
+    {
+      "id": "timber_ndmi_loss",
+      "fire": "timber",
+      "name": "NDMI_loss",
+      "description": "Pre-fire NDMI minus post-fire NDMI",
+      "category": "Sentinel-2",
+      "path": "timber/integrated/ndmi_loss.tif",
+      "format": "GeoTIFF",
+      "crs": "EPSG:32610",
+      "resolution_m": 20,
+      "units": "unitless",
+      "colormap": "RdYlBu",
+      "display_min": 0.02119055949151516,
+      "display_max": 0.794927716255188,
+      "statistics": {
+        "valid_pixels": 257403,
+        "min": -0.16056984663009644,
+        "max": 1.127577543258667,
+        "mean": 0.367760568857193,
+        "median": 0.3521174490451813
+      }
+    },
+    {
+      "id": "timber_nisar_hh_change",
+      "fire": "timber",
+      "name": "NISAR_HH_change",
+      "description": "Post-fire minus pre-fire HH backscatter",
+      "category": "NISAR",
+      "path": "timber/integrated/nisar_hh_change.tif",
+      "format": "GeoTIFF",
+      "crs": "EPSG:32610",
+      "resolution_m": 20,
+      "units": "dB",
+      "colormap": "RdBu_r",
+      "display_min": -2.5258326530456543,
+      "display_max": 3.301270008087158,
+      "statistics": {
+        "valid_pixels": 256581,
+        "min": -7.225142478942871,
+        "max": 9.769500732421875,
+        "mean": 0.38814085721969604,
+        "median": 0.3994112014770508
+      }
+    },
+    {
+      "id": "timber_nisar_hv_change",
+      "fire": "timber",
+      "name": "NISAR_HV_change",
+      "description": "Post-fire minus pre-fire HV backscatter",
+      "category": "NISAR",
+      "path": "timber/integrated/nisar_hv_change.tif",
+      "format": "GeoTIFF",
+      "crs": "EPSG:32610",
+      "resolution_m": 20,
+      "units": "dB",
+      "colormap": "RdBu_r",
+      "display_min": -3.5787711143493652,
+      "display_max": 2.443047046661377,
+      "statistics": {
+        "valid_pixels": 256581,
+        "min": -9.899063110351562,
+        "max": 8.364801406860352,
+        "mean": -0.1572154015302658,
+        "median": -0.02546405792236328
+      }
+    },
+    {
+      "id": "timber_nisar_hh_during_change",
+      "fire": "timber",
+      "name": "NISAR_HH_during_change",
+      "description": "During-fire minus pre-fire HH backscatter",
+      "category": "NISAR",
+      "path": "timber/integrated/nisar_hh_during_change.tif",
+      "format": "GeoTIFF",
+      "crs": "EPSG:32610",
+      "resolution_m": 20,
+      "units": "dB",
+      "colormap": "RdBu_r",
+      "display_min": -1.067177176475525,
+      "display_max": 2.1729629039764404,
+      "statistics": {
+        "valid_pixels": 256578,
+        "min": -7.627104759216309,
+        "max": 9.848817825317383,
+        "mean": 0.44697120785713196,
+        "median": 0.41431713104248047
+      }
+    },
+    {
+      "id": "timber_nisar_hv_during_change",
+      "fire": "timber",
+      "name": "NISAR_HV_during_change",
+      "description": "During-fire minus pre-fire HV backscatter",
+      "category": "NISAR",
+      "path": "timber/integrated/nisar_hv_during_change.tif",
+      "format": "GeoTIFF",
+      "crs": "EPSG:32610",
+      "resolution_m": 20,
+      "units": "dB",
+      "colormap": "RdBu_r",
+      "display_min": -1.2129571437835693,
+      "display_max": 2.1058225631713867,
+      "statistics": {
+        "valid_pixels": 256578,
+        "min": -8.181815147399902,
+        "max": 9.74106502532959,
+        "mean": 0.3905603885650635,
+        "median": 0.3743929862976074
+      }
+    },
+    {
+      "id": "timber_elevation",
+      "fire": "timber",
+      "name": "Elevation",
+      "description": "Terrain elevation",
+      "category": "Terrain",
+      "path": "timber/integrated/elevation.tif",
+      "format": "GeoTIFF",
+      "crs": "EPSG:32610",
+      "resolution_m": 20,
+      "units": "metres",
+      "colormap": "terrain",
+      "display_min": 252.69444274902344,
+      "display_max": 1212.0,
+      "statistics": {
+        "valid_pixels": 257467,
+        "min": 73.08333587646484,
+        "max": 1460.611083984375,
+        "mean": 704.0308227539062,
+        "median": 703.4444580078125
+      }
+    },
+    {
+      "id": "timber_slope",
+      "fire": "timber",
+      "name": "Slope",
+      "description": "Terrain slope",
+      "category": "Terrain",
+      "path": "timber/integrated/slope.tif",
+      "format": "GeoTIFF",
+      "crs": "EPSG:32610",
+      "resolution_m": 20,
+      "units": "degrees",
+      "colormap": "terrain",
+      "display_min": 9.43859577178955,
+      "display_max": 42.408870697021484,
+      "statistics": {
+        "valid_pixels": 257467,
+        "min": 1.1042011976242065,
+        "max": 66.53485870361328,
+        "mean": 26.637542724609375,
+        "median": 27.08991050720215
+      }
+    },
+    {
+      "id": "timber_screening_score",
+      "fire": "timber",
+      "name": "Screening_Score",
+      "description": "Relative multi-source change screening index",
+      "category": "Integrated analysis",
+      "path": "timber/integrated/screening_score.tif",
+      "format": "GeoTIFF",
+      "crs": "EPSG:32610",
+      "resolution_m": 20,
+      "units": "0-100 relative index",
+      "colormap": "YlOrRd",
+      "display_min": 0,
+      "display_max": 100,
+      "statistics": {
+        "valid_pixels": 256495,
+        "min": 0.0,
+        "max": 100.0,
+        "mean": 44.71983337402344,
+        "median": 43.85712814331055
+      }
+    },
+    {
+      "id": "plaskett_dnbr_gee_source",
+      "fire": "plaskett",
+      "name": "dNBR_GEE_source",
+      "description": "Original GEE dNBR export",
+      "category": "Sentinel-2",
+      "path": "plaskett/integrated/dnbr_gee_source.tif",
+      "format": "GeoTIFF",
+      "crs": "EPSG:32610",
+      "resolution_m": 20,
+      "units": "unitless",
+      "colormap": "RdYlGn",
+      "display_min": 0.03475404158234596,
+      "display_max": 0.9860301613807678,
+      "statistics": {
+        "valid_pixels": 303457,
+        "min": -0.20128661394119263,
+        "max": 1.2896603345870972,
+        "mean": 0.4863613247871399,
+        "median": 0.4779402017593384
+      }
+    },
+    {
+      "id": "plaskett_dnbr",
+      "fire": "plaskett",
+      "name": "dNBR",
+      "description": "Aligned pre-fire NBR minus post-fire NBR",
+      "category": "Sentinel-2",
+      "path": "plaskett/integrated/dnbr.tif",
+      "format": "GeoTIFF",
+      "crs": "EPSG:32610",
+      "resolution_m": 20,
+      "units": "unitless",
+      "colormap": "RdYlGn",
+      "display_min": 0.03475404158234596,
+      "display_max": 0.9860301613807678,
+      "statistics": {
+        "valid_pixels": 303457,
+        "min": -0.20128661394119263,
+        "max": 1.2896603345870972,
+        "mean": 0.4863613247871399,
+        "median": 0.4779402017593384
+      }
+    },
+    {
+      "id": "plaskett_ndvi_loss",
+      "fire": "plaskett",
+      "name": "NDVI_loss",
+      "description": "Pre-fire NDVI minus post-fire NDVI",
+      "category": "Sentinel-2",
+      "path": "plaskett/integrated/ndvi_loss.tif",
+      "format": "GeoTIFF",
+      "crs": "EPSG:32610",
+      "resolution_m": 20,
+      "units": "unitless",
+      "colormap": "RdYlGn",
+      "display_min": -0.005528535693883896,
+      "display_max": 0.6965294480323792,
+      "statistics": {
+        "valid_pixels": 303457,
+        "min": -0.19841909408569336,
+        "max": 0.8244004249572754,
+        "mean": 0.34021151065826416,
+        "median": 0.3556765913963318
+      }
+    },
+    {
+      "id": "plaskett_ndmi_loss",
+      "fire": "plaskett",
+      "name": "NDMI_loss",
+      "description": "Pre-fire NDMI minus post-fire NDMI",
+      "category": "Sentinel-2",
+      "path": "plaskett/integrated/ndmi_loss.tif",
+      "format": "GeoTIFF",
+      "crs": "EPSG:32610",
+      "resolution_m": 20,
+      "units": "unitless",
+      "colormap": "RdYlBu",
+      "display_min": 0.005946848541498184,
+      "display_max": 0.6443667411804199,
+      "statistics": {
+        "valid_pixels": 303457,
+        "min": -0.15317237377166748,
+        "max": 0.9603487849235535,
+        "mean": 0.29780659079551697,
+        "median": 0.29443731904029846
+      }
+    },
+    {
+      "id": "plaskett_nisar_hh_change",
+      "fire": "plaskett",
+      "name": "NISAR_HH_change",
+      "description": "Post-fire minus pre-fire HH backscatter",
+      "category": "NISAR",
+      "path": "plaskett/integrated/nisar_hh_change.tif",
+      "format": "GeoTIFF",
+      "crs": "EPSG:32610",
+      "resolution_m": 20,
+      "units": "dB",
+      "colormap": "RdBu_r",
+      "display_min": -5.896065711975098,
+      "display_max": 2.040823221206665,
+      "statistics": {
+        "valid_pixels": 302911,
+        "min": -11.6873197555542,
+        "max": 9.771312713623047,
+        "mean": -1.1599820852279663,
+        "median": -0.7941160202026367
+      }
+    },
+    {
+      "id": "plaskett_nisar_hv_change",
+      "fire": "plaskett",
+      "name": "NISAR_HV_change",
+      "description": "Post-fire minus pre-fire HV backscatter",
+      "category": "NISAR",
+      "path": "plaskett/integrated/nisar_hv_change.tif",
+      "format": "GeoTIFF",
+      "crs": "EPSG:32610",
+      "resolution_m": 20,
+      "units": "dB",
+      "colormap": "RdBu_r",
+      "display_min": -7.728704452514648,
+      "display_max": 1.5820295810699463,
+      "statistics": {
+        "valid_pixels": 302911,
+        "min": -13.196380615234375,
+        "max": 5.2663068771362305,
+        "mean": -1.9753708839416504,
+        "median": -1.3795433044433594
+      }
+    },
+    {
+      "id": "plaskett_nisar_hh_during_change",
+      "fire": "plaskett",
+      "name": "NISAR_HH_during_change",
+      "description": "During-fire minus pre-fire HH backscatter",
+      "category": "NISAR",
+      "path": "plaskett/integrated/nisar_hh_during_change.tif",
+      "format": "GeoTIFF",
+      "crs": "EPSG:32610",
+      "resolution_m": 20,
+      "units": "dB",
+      "colormap": "RdBu_r",
+      "display_min": -5.51686954498291,
+      "display_max": 2.1602444648742676,
+      "statistics": {
+        "valid_pixels": 302912,
+        "min": -11.520461082458496,
+        "max": 12.22875690460205,
+        "mean": -0.861699640750885,
+        "median": -0.535137414932251
+      }
+    },
+    {
+      "id": "plaskett_nisar_hv_during_change",
+      "fire": "plaskett",
+      "name": "NISAR_HV_during_change",
+      "description": "During-fire minus pre-fire HV backscatter",
+      "category": "NISAR",
+      "path": "plaskett/integrated/nisar_hv_during_change.tif",
+      "format": "GeoTIFF",
+      "crs": "EPSG:32610",
+      "resolution_m": 20,
+      "units": "dB",
+      "colormap": "RdBu_r",
+      "display_min": -7.161280632019043,
+      "display_max": 1.70379638671875,
+      "statistics": {
+        "valid_pixels": 302912,
+        "min": -13.50358772277832,
+        "max": 6.04026985168457,
+        "mean": -1.5206547975540161,
+        "median": -0.9841351509094238
+      }
+    },
+    {
+      "id": "plaskett_elevation",
+      "fire": "plaskett",
+      "name": "Elevation",
+      "description": "Terrain elevation",
+      "category": "Terrain",
+      "path": "plaskett/integrated/elevation.tif",
+      "format": "GeoTIFF",
+      "crs": "EPSG:32610",
+      "resolution_m": 20,
+      "units": "metres",
+      "colormap": "terrain",
+      "display_min": 212.4166717529297,
+      "display_max": 1002.138916015625,
+      "statistics": {
+        "valid_pixels": 303435,
+        "min": 18.0,
+        "max": 1135.02783203125,
+        "mean": 669.9993286132812,
+        "median": 685.25
+      }
+    },
+    {
+      "id": "plaskett_slope",
+      "fire": "plaskett",
+      "name": "Slope",
+      "description": "Terrain slope",
+      "category": "Terrain",
+      "path": "plaskett/integrated/slope.tif",
+      "format": "GeoTIFF",
+      "crs": "EPSG:32610",
+      "resolution_m": 20,
+      "units": "degrees",
+      "colormap": "terrain",
+      "display_min": 6.141892433166504,
+      "display_max": 34.6124153137207,
+      "statistics": {
+        "valid_pixels": 303435,
+        "min": 0.2674393653869629,
+        "max": 54.104854583740234,
+        "mean": 20.867029190063477,
+        "median": 21.172119140625
+      }
+    },
+    {
+      "id": "plaskett_screening_score",
+      "fire": "plaskett",
+      "name": "Screening_Score",
+      "description": "Relative multi-source change screening index",
+      "category": "Integrated analysis",
+      "path": "plaskett/integrated/screening_score.tif",
+      "format": "GeoTIFF",
+      "crs": "EPSG:32610",
+      "resolution_m": 20,
+      "units": "0-100 relative index",
+      "colormap": "YlOrRd",
+      "display_min": 0,
+      "display_max": 100,
+      "statistics": {
+        "valid_pixels": 302911,
+        "min": 0.0,
+        "max": 99.66858673095703,
+        "mean": 45.06188201904297,
+        "median": 45.24155807495117
+      }
+    }
+  ],
+  "integrated_stack_bands": [
+    "NDVI_pre",
+    "NDVI_during",
+    "NDVI_post",
+    "NDMI_pre",
+    "NDMI_during",
+    "NDMI_post",
+    "NBR_pre",
+    "NBR_during",
+    "NBR_post",
+    "dNBR",
+    "HH_pre_dB",
+    "HH_during_dB",
+    "HH_post_dB",
+    "HV_pre_dB",
+    "HV_during_dB",
+    "HV_post_dB",
+    "HH_post_change_dB",
+    "HV_post_change_dB",
+    "Elevation",
+    "Slope",
+    "Screening_Score"
+  ],
+  "sentinel2_band_order": {
+    "B2": 1,
+    "B3": 2,
+    "B4": 3,
+    "B8": 4,
+    "B11": 5,
+    "B12": 6,
+    "NDVI": 7,
+    "NDMI": 8,
+    "NBR": 9
+  },
+  "screening_score_weights": {
+    "dNBR": 0.22,
+    "NDVI_loss": 0.22,
+    "NDMI_loss": 0.22,
+    "HH_change": 0.12,
+    "HV_change": 0.12,
+    "slope": 0.1
+  },
+  "scientific_notes": [
+    "NISAR inputs are provisional GCOV products.",
+    "Validated and provisional NISAR products are not combined.",
+    "GCOV HH/HV diagonal terms represent gamma-zero backscatter, not coherence or displacement.",
+    "NISAR backscatter changes are not direct measurements of burn severity.",
+    "dNBR is a spectral change indicator and has not been field-calibrated as burn severity.",
+    "The screening index is a relative multi-source screening indicator, not a probability.",
+    "Elevation and slope are resampled from the source terrain raster to the 20 m analysis grid.",
+    "The analysis grid is aligned within each fire AOI; the two fire grids are independent."
+  ]
+}

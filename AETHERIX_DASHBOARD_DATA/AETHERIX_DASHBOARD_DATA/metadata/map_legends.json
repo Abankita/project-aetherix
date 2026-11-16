@@ -1,0 +1,38 @@
+{
+  "dNBR": {
+    "title": "dNBR",
+    "units": "unitless",
+    "palette": "RdYlGn",
+    "note": "Spectral change indicator; not calibrated burn severity."
+  },
+  "NDVI_loss": {
+    "title": "NDVI loss",
+    "units": "unitless",
+    "palette": "RdYlGn",
+    "note": "Pre-fire NDVI minus post-fire NDVI."
+  },
+  "NDMI_loss": {
+    "title": "NDMI loss",
+    "units": "unitless",
+    "palette": "RdYlBu",
+    "note": "Pre-fire NDMI minus post-fire NDMI."
+  },
+  "NISAR_HH_change": {
+    "title": "HH backscatter change",
+    "units": "dB",
+    "palette": "RdBu_r",
+    "note": "Post-fire minus pre-fire gamma-zero backscatter."
+  },
+  "NISAR_HV_change": {
+    "title": "HV backscatter change",
+    "units": "dB",
+    "palette": "RdBu_r",
+    "note": "Post-fire minus pre-fire gamma-zero backscatter."
+  },
+  "Screening_Score": {
+    "title": "Multi-source screening index",
+    "units": "relative index (0-100)",
+    "palette": "YlOrRd",
+    "note": "Relative screening index, not a calibrated probability or burn severity."
+  }
+}

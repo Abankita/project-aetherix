@@ -4,6 +4,7 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 import { MapService, BasemapProvider } from '@/services/mapService';
 import { DATA_SOURCES } from '@/config/dataSources';
 import { MAP_THEME } from '@/config/mapTheme';
+import { aetherixApi, RasterLayer } from '@/services/aetherixApi';
 import { RotateCcw, Layers, Loader2 } from 'lucide-react';
 import { useTheme } from '@/context/ThemeContext';
 
@@ -22,6 +23,9 @@ interface InteractiveMapProps {
   height?: string;
   interactive?: boolean;
   showInternalControls?: boolean;
+  rasterLayer?: RasterLayer | null;
+  rasterOpacity?: number;
+  rasterBands?: number[];
 }
 
 // In-memory cache for GeoJSON to guarantee instant loading without network failures
@@ -41,9 +45,18 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
   height = '540px',
   interactive = true,
   showInternalControls = true,
+  rasterLayer = null,
+  rasterOpacity = 0.78,
+  rasterBands,
 }) => {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
+  const rasterLayerRef = useRef<RasterLayer | null>(rasterLayer);
+  const rasterOpacityRef = useRef(rasterOpacity);
+  const rasterBandsRef = useRef(rasterBands);
+  rasterLayerRef.current = rasterLayer;
+  rasterOpacityRef.current = rasterOpacity;
+  rasterBandsRef.current = rasterBands;
   const isFirstMount = useRef(true);
   const [loading, setLoading] = useState(true);
   const [hasWebGlError, setHasWebGlError] = useState(false);
@@ -55,11 +68,48 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
   // Inject vector layers into the map
   const addVectorLayers = useCallback(async (map: maplibregl.Map) => {
     try {
+      const activeRaster = rasterLayerRef.current;
+      if (map.getLayer('aetherix-processed-raster')) map.removeLayer('aetherix-processed-raster');
+      if (map.getSource('aetherix-processed-raster')) map.removeSource('aetherix-processed-raster');
+      if (activeRaster) {
+        map.addSource('aetherix-processed-raster', {
+          type: 'raster',
+          tiles: [aetherixApi.tileTemplate(activeRaster, rasterBandsRef.current)],
+          tileSize: 256,
+          attribution: 'AETHERIX processed 20 m raster data',
+        });
+        map.addLayer({
+          id: 'aetherix-processed-raster',
+          type: 'raster',
+          source: 'aetherix-processed-raster',
+          paint: { 'raster-opacity': rasterOpacityRef.current, 'raster-resampling': 'linear' },
+        });
+      }
+
       // 1. Fire Perimeters GeoJSON
       if (!cachedFireGeoJson) {
-        const fireRes = await fetch(DATA_SOURCES.vectorFiles.firePerimetersGeoJson);
-        if (fireRes.ok) {
-          cachedFireGeoJson = await fireRes.json();
+        try {
+          const [timberRes, plaskettRes] = await Promise.all([
+            fetch('/api/vectors/timber/boundary'),
+            fetch('/api/vectors/plaskett/boundary'),
+          ]);
+          if (timberRes.ok && plaskettRes.ok) {
+            const collections = await Promise.all([timberRes.json(), plaskettRes.json()]);
+            cachedFireGeoJson = {
+              type: 'FeatureCollection',
+              features: collections.flatMap((collection: any, index: number) =>
+                (collection.features || []).map((feature: any) => ({
+                  ...feature,
+                  properties: { ...feature.properties, id: index === 0 ? 'timber' : 'plaskett' },
+                }))),
+            };
+          }
+        } catch (error) {
+          console.warn('Processed fire boundaries unavailable:', error);
+        }
+        if (!cachedFireGeoJson) {
+          const fireRes = await fetch(DATA_SOURCES.vectorFiles.firePerimetersGeoJson);
+          if (fireRes.ok) cachedFireGeoJson = await fireRes.json();
         }
       }
 
@@ -123,9 +173,28 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
 
       // 2. HUC-12 Watersheds GeoJSON
       if (!cachedHucGeoJson) {
-        const hucRes = await fetch(DATA_SOURCES.vectorFiles.watershedsGeoJson);
-        if (hucRes.ok) {
-          cachedHucGeoJson = await hucRes.json();
+        try {
+          const [timberRes, plaskettRes] = await Promise.all([
+            fetch('/api/vectors/timber/watersheds'),
+            fetch('/api/vectors/plaskett/watersheds'),
+          ]);
+          if (timberRes.ok && plaskettRes.ok) {
+            const collections = await Promise.all([timberRes.json(), plaskettRes.json()]);
+            cachedHucGeoJson = {
+              type: 'FeatureCollection',
+              features: collections.flatMap((collection: any, index: number) =>
+                (collection.features || []).map((feature: any) => ({
+                  ...feature,
+                  properties: { ...feature.properties, fire_id: index === 0 ? 'timber' : 'plaskett' },
+                }))),
+            };
+          }
+        } catch (error) {
+          console.warn('Processed watershed boundaries unavailable:', error);
+        }
+        if (!cachedHucGeoJson) {
+          const hucRes = await fetch(DATA_SOURCES.vectorFiles.watershedsGeoJson);
+          if (hucRes.ok) cachedHucGeoJson = await hucRes.json();
         }
       }
 
@@ -183,6 +252,11 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
       setLoading(false);
     }
   }, [interactive, onSelectFire, onSelectWatershed]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (map?.isStyleLoaded()) addVectorLayers(map);
+  }, [rasterLayer, rasterOpacity, rasterBands, addVectorLayers]);
 
   // Initialize MapLibre
   useEffect(() => {
@@ -408,7 +482,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
             onClick={toggleProvider}
             type="button"
             className="flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-mono font-medium backdrop-blur-md bg-white/95 text-[#18191D] border border-gray-200/90 hover:bg-gray-50 shadow-sm dark:bg-[#121418]/90 dark:text-white dark:border-white/20 dark:hover:bg-[#121418] transition-all cursor-pointer"
-            title="Toggle between MapTiler / OpenStreetMap Basemaps"
+            title="Toggle basemap"
           >
             <Layers className="w-3.5 h-3.5 text-[#29C9D2] pointer-events-none" />
             <span className="pointer-events-none uppercase text-[11px] tracking-wider font-semibold">
@@ -424,14 +498,6 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
           >
             <RotateCcw className="w-3.5 h-3.5 pointer-events-none text-[#29C9D2]" />
           </button>
-        </div>
-      )}
-
-      {/* Top Right: Map Provider Status Callout */}
-      {showInternalControls && (
-        <div className="absolute top-4 right-14 z-10 hidden sm:flex items-center gap-1.5 bg-amber-50/95 dark:bg-[#121418]/85 backdrop-blur-md px-3 py-1 rounded-full border border-amber-300 dark:border-amber-400/30 text-[10px] font-mono text-amber-900 dark:text-amber-200 pointer-events-none shadow-xs">
-          <span className="w-1.5 h-1.5 rounded-full bg-amber-500 dark:bg-amber-400 animate-pulse"></span>
-          <span>Awaiting MapTiler API Key in .env.local</span>
         </div>
       )}
 

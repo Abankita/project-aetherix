@@ -16,12 +16,10 @@ import {
 import { InteractiveMap } from '@/components/maps/InteractiveMap';
 import { ContactForm } from '@/components/forms/ContactForm';
 import { FeedbackForm } from '@/components/forms/FeedbackForm';
-import { DATA_SOURCES } from '@/config/dataSources';
 import { TEAM_MEMBERS } from '@/config/team';
 
 export const PublicPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'contact' | 'feedback'>('contact');
-  const inventory = DATA_SOURCES.metadata.inventory;
 
   const scrollTo = (id: string) => {
     const el = document.getElementById(id);
@@ -64,7 +62,7 @@ export const PublicPage: React.FC = () => {
           <div className="max-w-[1440px] mx-auto">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
               {/* Left Column: Heading, Subtitle & Action Pills (Protected by frosted card plate so all text is 100% visible) */}
-              <div className="lg:col-span-5 space-y-7 bg-white/92 dark:bg-[#111C28]/92 backdrop-blur-md p-8 sm:p-10 rounded-3xl border border-[#E9E7E5] dark:border-[rgba(160,180,195,0.16)] shadow-lg">
+              <div className="lg:col-span-5 space-y-7 p-8 sm:p-10">
                 <div className="inline-block text-xs sm:text-sm font-mono uppercase tracking-widest text-[#478ED8] dark:text-[#36C5D9] font-bold">
                   Big Sur Wildfire Intelligence Initiative
                 </div>
@@ -120,10 +118,6 @@ export const PublicPage: React.FC = () => {
                       </button>
                     </div>
 
-                    <div className="flex items-center gap-2 font-mono text-xs sm:text-sm text-[#6B7280] dark:text-gray-400">
-                      <span className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
-                      <span>Awaiting MapTiler API Key in .env.local</span>
-                    </div>
                   </div>
 
                   {/* Real MapLibre Geospatial Map Instance — Substantial & Comfortable Height */}
@@ -163,7 +157,7 @@ export const PublicPage: React.FC = () => {
                           Preliminary Catchments
                         </span>
                         <span className="text-[#111827] dark:text-white font-bold text-sm">
-                          {inventory.huc12Units} HUC-12 Watershed Units
+                          11 HUC-12 Watershed Features
                         </span>
                       </div>
                     </div>
@@ -172,10 +166,10 @@ export const PublicPage: React.FC = () => {
                       <div className="w-2.5 h-2.5 rounded-full bg-[#478ED8]"></div>
                       <div>
                         <span className="text-[#6B7280] dark:text-gray-400 block text-[11px] uppercase font-semibold">
-                          Pre-Fire Observation Scenes
+                          Sentinel-2 Phase Composites
                         </span>
                         <span className="text-[#111827] dark:text-white font-bold text-sm">
-                          {inventory.preFireScenes} Pre-Fire Sentinel-2 Scenes
+                          3 Pre, During &amp; Post Phases per Fire
                         </span>
                       </div>
                     </div>
@@ -184,10 +178,10 @@ export const PublicPage: React.FC = () => {
                       <div className="w-2.5 h-2.5 rounded-full bg-[#F49A48]"></div>
                       <div>
                         <span className="text-[#6B7280] dark:text-gray-400 block text-[11px] uppercase font-semibold">
-                          Post-Fire Observation Scenes
+                          NISAR Phase Summaries
                         </span>
                         <span className="text-[#111827] dark:text-white font-bold text-sm">
-                          {inventory.postFireScenes} Post-Fire Sentinel-2 Scenes
+                          3 Pre, During &amp; Post Phases per Fire
                         </span>
                       </div>
                     </div>
@@ -199,7 +193,7 @@ export const PublicPage: React.FC = () => {
                   <div className="flex items-center gap-3">
                     <Info className="w-5 h-5 shrink-0 text-[#478ED8] dark:text-[#36C5D9]" />
                     <span>
-                      <strong>Operational Inventory Notice:</strong> Preliminary processing inventory metrics shown. Vector boundaries displayed from actual project GeoJSON (EPSG:32610 UTM Zone 10N).
+                      <strong>How to read these counts:</strong> The 11 watershed features are the boundary records across both study areas. Each fire has Sentinel-2 composites and NISAR summaries for pre-fire, during-fire and post-fire phases. These are processing phases, not satellite pass counts or risk ratings.
                     </span>
                   </div>
                   <Link
@@ -225,7 +219,7 @@ export const PublicPage: React.FC = () => {
             {/* Clean Editorial Two-Column Composition */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
               {/* Left Column: Research Context & 4 Scientific Pillars */}
-              <div className="lg:col-span-7 space-y-8 bg-white/92 dark:bg-[#111C28]/92 backdrop-blur-md p-8 sm:p-10 rounded-3xl border border-[#E9E7E5] dark:border-[rgba(160,180,195,0.16)] shadow-lg">
+              <div className="lg:col-span-7 space-y-8 p-8 sm:p-10">
                 <div>
                   <div className="text-xs sm:text-sm uppercase font-mono tracking-widest text-[#478ED8] dark:text-[#36C5D9] font-bold mb-3">
                     Research Context

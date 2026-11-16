@@ -2,6 +2,8 @@
 
 **A post-wildfire geospatial research platform for Big Sur, California**
 
+**Live URL**: [project-aetherix.vercel.app](https://project-aetherix.vercel.app/)
+
 AFTER THE FIRE is an interactive research platform developed by **AETHERIX** to examine post-wildfire landscape changes across the Timber and Plaskett fire study areas in Big Sur, Monterey County, California, USA. It brings together optical satellite observations, L-band radar observations, fire perimeters, watershed boundaries and terrain information to support spatial investigation and watershed monitoring prioritisation.
 
 The platform consists of a public-facing project website and a five-page interactive research dashboard. It presents precomputed geospatial products; computationally intensive satellite processing is performed outside the browser.

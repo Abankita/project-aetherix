@@ -17,8 +17,8 @@ interface ComparisonSliderProps {
 export const ComparisonSlider: React.FC<ComparisonSliderProps> = ({
   beforeLabel = 'SENTINEL-2 PRE-FIRE (NBR)',
   afterLabel = 'SENTINEL-2 POST-FIRE (dNBR)',
-  beforeDate = '2024-06-14',
-  afterDate = '2024-08-28',
+  beforeDate = 'Pre-fire phase',
+  afterDate = 'Post-fire phase',
   beforeRasterSrc,
   afterRasterSrc,
   isRasterConnected = false,
@@ -117,7 +117,7 @@ export const ComparisonSlider: React.FC<ComparisonSliderProps> = ({
                   : 'text-[#626873] dark:text-[#AAB5C2] hover:text-[#18191D] dark:hover:text-[#F3F6F8]'
               }`}
             >
-              dNBR (Severity)
+              dNBR (spectral change)
             </button>
           </div>
         </div>
@@ -332,7 +332,7 @@ export const ComparisonSlider: React.FC<ComparisonSliderProps> = ({
             </div>
             <div className="flex items-center gap-1 text-[10px] font-mono text-emerald-300">
               <Calendar className="w-3 h-3" />
-              <span>Acquired: {beforeDate}</span>
+              <span>Window: {beforeDate}</span>
             </div>
           </div>
         </div>
@@ -346,7 +346,7 @@ export const ComparisonSlider: React.FC<ComparisonSliderProps> = ({
             </div>
             <div className="flex items-center justify-end gap-1 text-[10px] font-mono text-red-300">
               <Calendar className="w-3 h-3" />
-              <span>Acquired: {afterDate}</span>
+              <span>Window: {afterDate}</span>
             </div>
           </div>
         </div>
@@ -355,20 +355,14 @@ export const ComparisonSlider: React.FC<ComparisonSliderProps> = ({
         <div className="absolute bottom-4 left-4 z-20 pointer-events-none hidden sm:block">
           <div className="bg-[#121418]/90 backdrop-blur-md px-3 py-2 rounded-xl border border-white/15 text-white shadow-lg space-y-1.5">
             <div className="text-[10px] font-mono uppercase tracking-wider text-gray-300 font-bold">
-              USGS Burn Severity Scale
+              dNBR Spectral Change Indicator · Not Field-calibrated Severity
             </div>
             <div className="flex items-center gap-2 text-[10px] font-mono">
               <span className="flex items-center gap-1">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#43C99A]" /> Unburned (&lt;0.10)
+                <span className="w-2.5 h-2.5 rounded-full bg-[#43C99A]" /> Lower values
               </span>
               <span className="flex items-center gap-1">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#E9B75C]" /> Low (0.10-0.27)
-              </span>
-              <span className="flex items-center gap-1">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#F49A48]" /> Mod (0.27-0.44)
-              </span>
-              <span className="flex items-center gap-1">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#F06470]" /> High (&gt;0.44)
+                <span className="w-2.5 h-2.5 rounded-full bg-[#F49A48]" /> Higher values
               </span>
             </div>
           </div>

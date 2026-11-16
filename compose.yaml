@@ -1,4 +1,17 @@
 services:
+  geospatial-api:
+    container_name: aetherix-geospatial-api
+    build:
+      context: ./backend
+    environment:
+      DATA_ROOT: /data
+      CORS_ORIGINS: http://localhost:8080,http://localhost:5173
+    volumes:
+      - ./AETHERIX_DASHBOARD_DATA/AETHERIX_DASHBOARD_DATA:/data:ro
+    expose:
+      - "8000"
+    restart: unless-stopped
+
   after-the-fire:
     container_name: aetherix-after-the-fire
     build:
@@ -9,4 +22,6 @@ services:
         VITE_CARTO_BASEMAPS_KEY: ${VITE_CARTO_BASEMAPS_KEY:-cb1_59lw_1_b}
     ports:
       - "8080:80"
+    depends_on:
+      - geospatial-api
     restart: unless-stopped

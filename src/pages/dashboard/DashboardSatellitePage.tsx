@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ComparisonSlider } from '@/components/maps/ComparisonSlider';
 import { InteractiveMap } from '@/components/maps/InteractiveMap';
+import { aetherixApi, FireSummary, RasterLayer } from '@/services/aetherixApi';
 import {
   Satellite,
   Radio,
@@ -14,6 +15,17 @@ import {
 } from 'lucide-react';
 
 export const DashboardSatellitePage: React.FC = () => {
+  const [fireId, setFireId] = useState<'timber' | 'plaskett'>('timber');
+  const [processedLayers, setProcessedLayers] = useState<RasterLayer[]>([]);
+  const [phaseObservations, setPhaseObservations] = useState<Record<string, unknown>[]>([]);
+  const [fireSummary, setFireSummary] = useState<FireSummary | null>(null);
+  useEffect(() => {
+    let active = true;
+    Promise.all([aetherixApi.layers(fireId), aetherixApi.timeseries(fireId), aetherixApi.summary(fireId)]).then(([layerData, timeData, summary]) => {
+      if (active) { setProcessedLayers(layerData.layers); setPhaseObservations(timeData.observations); setFireSummary(summary); }
+    }).catch(() => active && setProcessedLayers([]));
+    return () => { active = false; };
+  }, [fireId]);
   // Primary top-level comparison mode: 'cross-sensor' (default) | 'temporal'
   const [comparisonMode, setComparisonMode] = useState<'temporal' | 'cross-sensor'>('cross-sensor');
 
@@ -24,18 +36,42 @@ export const DashboardSatellitePage: React.FC = () => {
   const [temporalLayer, setTemporalLayer] = useState<'pre-nbr' | 'post-nbr' | 'dnbr'>('dnbr');
 
   // Optical side layer (Cross-sensor left map)
-  const [opticalLayer, setOpticalLayer] = useState<'pre-optical' | 'post-optical' | 'dnbr'>('dnbr');
+  const [opticalLayer, setOpticalLayer] = useState<'natural' | 'false' | 'NDVI' | 'NDMI' | 'NBR' | 'dnbr'>('dnbr');
+  const [opticalPhase, setOpticalPhase] = useState<'pre' | 'during' | 'post'>('post');
 
   // Radar side layer (Cross-sensor right map)
-  const [radarLayer, setRadarLayer] = useState<'pre-sar' | 'post-sar' | 'sar-change'>('sar-change');
+  const [radarLayer, setRadarLayer] = useState<'pre-sar' | 'during-sar' | 'post-sar' | 'during-change' | 'sar-change' | 'pre-count' | 'during-count' | 'post-count'>('sar-change');
 
-  // Polarization channel: 'VH' (Volume) | 'VV' (Surface)
-  const [polarization, setPolarization] = useState<'VV' | 'VH'>('VH');
+  // The processed package contains HH and HV gamma-zero backscatter products.
+  const [polarization, setPolarization] = useState<'HH' | 'HV'>('HV');
 
-  const concordanceSummary = {
-    highConcordancePct: 74.1,
-    opticalOnlyPct: 14.3,
-    radarOnlyPct: 11.6,
+  const getRaster = (role: 'optical' | 'radar') => {
+    if (role === 'optical') {
+      if (opticalLayer === 'dnbr') return processedLayers.find((layer) => layer.path.endsWith('/integrated/dnbr.tif')) || null;
+      if (opticalLayer === 'natural' || opticalLayer === 'false') {
+        const phase = `${opticalPhase}_fire_stack_20m.tif`;
+        return processedLayers.find((layer) => layer.path.endsWith(`/sentinel2/stacks/${phase}`)) || null;
+      }
+      return processedLayers.find((layer) => layer.path.endsWith(`/sentinel2/bands/${opticalPhase}/${opticalLayer}.tif`)) || null;
+    }
+    if (radarLayer.endsWith('-count')) {
+      const phase = radarLayer.replace('-count', '');
+      return processedLayers.find((layer) => layer.path.endsWith(`/nisar/observation_counts/${polarization}_${phase}_count_20m.tif`)) || null;
+    }
+    if (radarLayer === 'during-change') return processedLayers.find((layer) => layer.path.endsWith(`/nisar/changes/${polarization}_during_minus_pre_20m_dB.tif`)) || null;
+    if (radarLayer === 'sar-change') return processedLayers.find((layer) => layer.path.endsWith(`/nisar/changes/${polarization}_post_minus_pre_20m_dB.tif`)) || null;
+    const phase = radarLayer === 'pre-sar' ? 'pre' : radarLayer === 'during-sar' ? 'during' : 'post';
+    return processedLayers.find((layer) => layer.path.endsWith(`/nisar/composites/${polarization}_${phase}_20m_dB.tif`)) || null;
+  };
+  const selectedOpticalBands = opticalLayer === 'false' ? [4, 3, 2] : opticalLayer === 'natural' ? [3, 2, 1] : undefined;
+  const phaseSummary = (source: string, layer: string, phase: string) => phaseObservations.find((row) => row.source === source && row.layer === layer && row.phase === phase);
+  const beforeNBR = processedLayers.find((layer) => layer.path.endsWith('/sentinel2/bands/pre/NBR.tif'));
+  const postNBR = processedLayers.find((layer) => layer.path.endsWith('/sentinel2/bands/post/NBR.tif'));
+  const dNBR = processedLayers.find((layer) => layer.path.endsWith('/integrated/dnbr.tif'));
+  const afterRaster = temporalLayer === 'pre-nbr' ? beforeNBR : temporalLayer === 'dnbr' ? dNBR : postNBR;
+  const layerPhaseLabel = (source: string, layer: string, phase: string) => {
+    const row = phaseSummary(source, layer, phase);
+    return row ? `Mean ${Number(row.mean).toFixed(3)} ${String(row.units)} · ${Number(row.valid_pixels).toLocaleString()} valid px` : 'Phase summary unavailable';
   };
 
   return (
@@ -86,6 +122,13 @@ export const DashboardSatellitePage: React.FC = () => {
           </button>
         </div>
       </div>
+      <div className="flex items-center gap-2 text-xs font-mono">
+        <label htmlFor="satellite-fire" className="text-gray-500 dark:text-[#AAB5C2]">Study area</label>
+        <select id="satellite-fire" value={fireId} onChange={(event) => setFireId(event.target.value as 'timber' | 'plaskett')} className="px-2.5 py-1.5 rounded-lg bg-white dark:bg-[#172330] text-[#18191D] dark:text-[#F3F6F8] border border-gray-200 dark:border-gray-700">
+          <option value="timber">Timber Fire</option><option value="plaskett">Plaskett Fire</option>
+        </select>
+      </div>
+      <p className="max-w-5xl text-sm leading-relaxed text-[#626873] dark:text-[#AAB5C2]">Use the layer menus to compare a phase or index. Image colors show the selected layer’s relative values; the pixel summaries report averages across available cells. NDVI and NDMI describe vegetation greenness and moisture response, dNBR describes optical change, and NISAR HH/HV describe radar backscatter. None of these means alone is a field-measured damage score.</p>
 
       {/* ========================================================================= */}
       {/* EXPERIENCE 1: TEMPORAL COMPARISON — BEFORE VS AFTER FIRE                  */}
@@ -124,18 +167,20 @@ export const DashboardSatellitePage: React.FC = () => {
                   ? 'SENTINEL-2 POST-FIRE (dNBR)'
                   : 'SENTINEL-2 POST-FIRE (NBR)'
               }
-              beforeDate="2024-06-14"
-              afterDate="2024-08-28"
+              beforeDate="Pre-fire phase; acquisition date not supplied"
+              afterDate={temporalLayer === 'pre-nbr' ? 'Pre-fire phase' : temporalLayer === 'dnbr' ? 'Pre-fire NBR minus post-fire NBR' : 'Post-fire phase; acquisition date not supplied'}
+              beforeRasterSrc={aetherixApi.previewUrl(fireId, beforeNBR)}
+              afterRasterSrc={aetherixApi.previewUrl(fireId, afterRaster)}
               activeLayer={temporalLayer}
               onLayerChange={setTemporalLayer}
-              isRasterConnected={false}
+              isRasterConnected={Boolean(beforeNBR && afterRaster)}
             />
           </section>
 
-          {/* Optical Severity Classification Thresholds */}
+          {/* Reference thresholds; these classes are not applied to this dataset */}
           <section className="p-6 rounded-3xl bg-white dark:bg-[#111C28] border border-gray-200/80 dark:border-[rgba(160,180,195,0.14)] shadow-xs space-y-4">
             <h4 className="font-bold text-sm text-[#18191D] dark:text-[#F3F6F8] uppercase font-mono tracking-wider">
-              USGS Differential NBR Standard Severity Thresholds
+              Reference dNBR Thresholds · Not Applied to These Results
             </h4>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               <div className="p-4 rounded-xl bg-gray-50 dark:bg-[#172330] border border-gray-100 dark:border-[rgba(160,180,195,0.12)] space-y-1">
@@ -144,7 +189,7 @@ export const DashboardSatellitePage: React.FC = () => {
                   dNBR &gt; +0.440
                 </div>
                 <div className="text-[11px] text-[#626873] dark:text-[#AAB5C2]">
-                  Complete canopy mortality
+                  Reference class only; not a field assessment
                 </div>
               </div>
               <div className="p-4 rounded-xl bg-gray-50 dark:bg-[#172330] border border-gray-100 dark:border-[rgba(160,180,195,0.12)] space-y-1">
@@ -153,7 +198,7 @@ export const DashboardSatellitePage: React.FC = () => {
                   +0.270 to +0.440
                 </div>
                 <div className="text-[11px] text-[#626873] dark:text-[#AAB5C2]">
-                  Sub-canopy scorch / char
+                  Reference class only; not field calibrated here
                 </div>
               </div>
               <div className="p-4 rounded-xl bg-gray-50 dark:bg-[#172330] border border-gray-100 dark:border-[rgba(160,180,195,0.12)] space-y-1">
@@ -241,25 +286,25 @@ export const DashboardSatellitePage: React.FC = () => {
               </span>
               <button
                 type="button"
-                onClick={() => setPolarization('VH')}
+                onClick={() => setPolarization('HV')}
                 className={`px-3 py-1.5 rounded-lg text-xs font-mono font-medium transition-all cursor-pointer ${
-                  polarization === 'VH'
+                  polarization === 'HV'
                     ? 'bg-[#A48DEB] text-white shadow-2xs font-semibold'
                     : 'bg-gray-100 dark:bg-[#172330] text-gray-600 dark:text-[#AAB5C2] hover:bg-gray-200'
                 }`}
               >
-                <span>VH (Volume Cross-Pol)</span>
+                <span>HV (Cross-Pol)</span>
               </button>
               <button
                 type="button"
-                onClick={() => setPolarization('VV')}
+                onClick={() => setPolarization('HH')}
                 className={`px-3 py-1.5 rounded-lg text-xs font-mono font-medium transition-all cursor-pointer ${
-                  polarization === 'VV'
+                  polarization === 'HH'
                     ? 'bg-[#A48DEB] text-white shadow-2xs font-semibold'
                     : 'bg-gray-100 dark:bg-[#172330] text-gray-600 dark:text-[#AAB5C2] hover:bg-gray-200'
                 }`}
               >
-                <span>VV (Surface Co-Pol)</span>
+                <span>HH (Co-Pol)</span>
               </button>
             </div>
           </div>
@@ -307,7 +352,7 @@ export const DashboardSatellitePage: React.FC = () => {
                     </h3>
                   </div>
                   <span className="text-[11px] font-mono text-[#858B95] dark:text-[#788796]">
-                    Acquisition: 2024-06-14 (Pre) · 2024-08-28 (Post)
+                    Processing phase: {opticalPhase} · dates are not included in the package inventory
                   </span>
                 </div>
 
@@ -318,18 +363,22 @@ export const DashboardSatellitePage: React.FC = () => {
                   className="px-2.5 py-1 text-xs font-mono rounded-lg bg-gray-100 dark:bg-[#172330] text-[#18191D] dark:text-[#F3F6F8] border border-gray-200 dark:border-[rgba(160,180,195,0.14)]"
                   aria-label="Sentinel-2 Optical Layer"
                 >
-                  <option value="dnbr">dNBR (Burn Severity)</option>
-                  <option value="pre-optical">Pre-Fire Optical Observation</option>
-                  <option value="post-optical">Post-Fire Optical Observation</option>
+                  <option value="natural">Sentinel-2 Natural Colour (B4, B3, B2)</option>
+                  <option value="false">Sentinel-2 False Colour (B8, B4, B3)</option>
+                  <option value="NDVI">Sentinel-2 NDVI</option>
+                  <option value="NDMI">Sentinel-2 NDMI</option>
+                  <option value="NBR">Sentinel-2 NBR</option>
+                  <option value="dnbr">Sentinel-2 dNBR</option>
                 </select>
               </div>
 
               {/* Map Canvas */}
-              <InteractiveMap height="380px" showFires={true} showWatersheds={true} />
+              <div className="flex items-center gap-2 text-xs font-mono"><label htmlFor="optical-phase">Composite phase</label><select id="optical-phase" value={opticalPhase} onChange={(event) => setOpticalPhase(event.target.value as 'pre'|'during'|'post')} className="px-2 py-1 rounded-lg bg-gray-100 dark:bg-[#172330] text-[#18191D] dark:text-[#F3F6F8]"><option value="pre">Pre-fire</option><option value="during">During-fire window</option><option value="post">Post-fire</option></select></div>
+              <InteractiveMap height="380px" selectedFireId={fireId} rasterLayer={getRaster('optical')} rasterBands={selectedOpticalBands} showFires={true} showWatersheds={true} />
 
               <div className="flex items-center justify-between text-xs font-mono text-[#858B95] dark:text-[#788796] pt-1">
-                <span>Band: Multi-Spectral SWIR/NIR</span>
-                <span>Spatial: 10m Ground Resolution</span>
+                <span>{getRaster('optical')?.name || 'Sentinel-2 optical layer'} · {getRaster('optical')?.units || 'unitless'}</span>
+                <span>Display {getRaster('optical')?.visualization.min ?? '—'}–{getRaster('optical')?.visualization.max ?? '—'} · {getRaster('optical')?.resolution?.[0] || 20} m</span>
               </div>
             </div>
 
@@ -355,18 +404,23 @@ export const DashboardSatellitePage: React.FC = () => {
                   className="px-2.5 py-1 text-xs font-mono rounded-lg bg-gray-100 dark:bg-[#172330] text-[#18191D] dark:text-[#F3F6F8] border border-gray-200 dark:border-[rgba(160,180,195,0.14)]"
                   aria-label="NISAR Radar Layer"
                 >
-                  <option value="sar-change">Radar Backscatter Change (Δσ0)</option>
-                  <option value="pre-sar">Pre-Fire Backscatter ({polarization})</option>
-                  <option value="post-sar">Post-Fire Backscatter ({polarization})</option>
+                  <option value="sar-change">Post minus pre backscatter change ({polarization})</option>
+                  <option value="during-change">During minus pre backscatter change ({polarization})</option>
+                  <option value="pre-sar">Pre-fire backscatter ({polarization})</option>
+                  <option value="during-sar">During-fire-window backscatter ({polarization})</option>
+                  <option value="post-sar">Post-fire backscatter ({polarization})</option>
+                  <option value="pre-count">Pre-fire {polarization} observation count</option>
+                  <option value="during-count">During-fire {polarization} observation count</option>
+                  <option value="post-count">Post-fire {polarization} observation count</option>
                 </select>
               </div>
 
               {/* Map Canvas */}
-              <InteractiveMap height="380px" showFires={true} showWatersheds={true} />
+              <InteractiveMap height="380px" selectedFireId={fireId} rasterLayer={getRaster('radar')} showFires={true} showWatersheds={true} />
 
               <div className="flex items-center justify-between text-xs font-mono text-[#858B95] dark:text-[#788796] pt-1">
-                <span>Product: GCOV Calibrated γ0 dB</span>
-                <span>Penetration: Canopy &amp; Sub-Surface</span>
+                <span>{getRaster('radar')?.name || 'NISAR backscatter'} · gamma-zero dB</span>
+                <span>{getRaster('radar')?.units === 'count' ? `Observation counts · display ${getRaster('radar')?.visualization.min ?? '—'}–${getRaster('radar')?.visualization.max ?? '—'}` : `Provisional NISAR · display ${getRaster('radar')?.visualization.min ?? '—'}–${getRaster('radar')?.visualization.max ?? '—'} dB`}</span>
               </div>
             </div>
           </div>
@@ -379,7 +433,7 @@ export const DashboardSatellitePage: React.FC = () => {
               </div>
               <div>
                 <h3 className="font-bold text-base text-[#18191D] dark:text-[#F3F6F8]">
-                  Dual-Sensor Concordance &amp; Discrepancy Matrix
+                  Processed Optical and Radar Summaries
                 </h3>
                 <p className="text-xs text-[#626873] dark:text-[#AAB5C2]">
                   Evaluating areas where optical burn indices (dNBR) agree or diverge from radar
@@ -390,7 +444,7 @@ export const DashboardSatellitePage: React.FC = () => {
 
             <div className="flex items-center gap-2">
               <span className="text-xs font-mono font-bold text-emerald-700 dark:text-[#43C99A] bg-emerald-100 dark:bg-emerald-950/60 px-3 py-1 rounded-full">
-                74.1% OVERALL CONCORDANCE
+                {fireSummary ? `${fireSummary.aoi_pixels.toLocaleString()} AOI PIXELS · ${fireSummary.common_valid_score_percent.toFixed(2)}% VALID COVERAGE` : 'LOADING PROCESSED SUMMARY'}
               </span>
             </div>
           </div>
@@ -400,54 +454,51 @@ export const DashboardSatellitePage: React.FC = () => {
             <div className="p-6 rounded-2xl bg-white dark:bg-[#111C28] border border-gray-200/80 dark:border-[rgba(160,180,195,0.14)] shadow-xs space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-mono uppercase text-emerald-600 dark:text-[#43C99A] font-bold">
-                  High Concordance
+                  Mean dNBR
                 </span>
                 <span className="text-lg font-bold font-mono text-[#18191D] dark:text-[#F3F6F8]">
-                  {concordanceSummary.highConcordancePct}%
+                  {fireSummary?.dNBR.mean.toFixed(3) ?? '—'}
                 </span>
               </div>
               <h4 className="font-bold text-sm text-[#18191D] dark:text-[#F3F6F8]">
-                Both Sensors Detect High Severity
+                Optical spectral change
               </h4>
               <p className="text-xs text-[#626873] dark:text-[#AAB5C2] leading-relaxed">
-                Both optical dNBR and SAR Δσ0 reflect catastrophic stand replacement. Typical in
-                steep south-facing chaparral and exposed canyon crowns.
+                The mean is the average dNBR value across valid cells in this fire grid. It describes spectral change and is not a calibrated damage or severity percentage.
               </p>
             </div>
 
             <div className="p-6 rounded-2xl bg-white dark:bg-[#111C28] border border-gray-200/80 dark:border-[rgba(160,180,195,0.14)] shadow-xs space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-mono uppercase text-[#F28C45] font-bold">
-                  Optical Over-Estimate
+                  Mean NDVI Loss
                 </span>
                 <span className="text-lg font-bold font-mono text-[#18191D] dark:text-[#F3F6F8]">
-                  {concordanceSummary.opticalOnlyPct}%
+                  {fireSummary?.NDVI_loss.mean.toFixed(3) ?? '—'}
                 </span>
               </div>
               <h4 className="font-bold text-sm text-[#18191D] dark:text-[#F3F6F8]">
-                High dNBR, Low Radar Delta
+                Vegetation-condition indicator
               </h4>
               <p className="text-xs text-[#626873] dark:text-[#AAB5C2] leading-relaxed">
-                Occurs where fast understory surface fires blackened ground ash, showing strong
-                optical char while deep redwood branch and trunk structure remained intact.
+                NDVI loss summarizes a change in vegetation index between the supplied phases. It is an index difference, not a direct count of dead plants or canopy cover.
               </p>
             </div>
 
             <div className="p-6 rounded-2xl bg-white dark:bg-[#111C28] border border-gray-200/80 dark:border-[rgba(160,180,195,0.14)] shadow-xs space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-mono uppercase text-[#A48DEB] font-bold">
-                  Radar Only Loss
+                  Mean NISAR HH / HV Change
                 </span>
                 <span className="text-lg font-bold font-mono text-[#18191D] dark:text-[#F3F6F8]">
-                  {concordanceSummary.radarOnlyPct}%
+                  {fireSummary ? `${fireSummary.NISAR_HH_change.mean.toFixed(2)} / ${fireSummary.NISAR_HV_change.mean.toFixed(2)} dB` : '—'}
                 </span>
               </div>
               <h4 className="font-bold text-sm text-[#18191D] dark:text-[#F3F6F8]">
-                High Radar Delta, Low dNBR
+                Provisional gamma-zero backscatter
               </h4>
               <p className="text-xs text-[#626873] dark:text-[#AAB5C2] leading-relaxed">
-                Canopy moisture desiccation and structural branch collapse under heavy smoke or in
-                shadowed north-facing drainages where optical SWIR response was degraded.
+                HH and HV are radar polarizations. Their change is in decibels (dB); values can also shift with moisture, surface roughness, vegetation and viewing geometry. NISAR inputs are marked provisional in the package.
               </p>
             </div>
           </div>
@@ -455,77 +506,30 @@ export const DashboardSatellitePage: React.FC = () => {
           {/* Detailed Concordance Matrix Table */}
           <div className="p-6 sm:p-8 rounded-3xl bg-white dark:bg-[#111C28] border border-gray-200/80 dark:border-[rgba(160,180,195,0.14)] shadow-xs space-y-5">
             <h4 className="font-bold text-sm text-[#18191D] dark:text-[#F3F6F8] uppercase font-mono tracking-wider">
-              Areas of Sensor Agreement &amp; Disagreement
+              Available Optical and NISAR Phase Statistics
             </h4>
-
+            <p className="text-sm leading-relaxed text-[#626873] dark:text-[#AAB5C2]">In the phase table, “mean” is the average reported raster value and “valid pixels” is the number of cells contributing to it. Observation counts show how many radar acquisitions contributed to a cell; higher counts mean more observations, not stronger fire impact. Dates are not available in the supplied phase summary.</p>
             <div className="overflow-x-auto">
               <table className="w-full text-xs font-mono text-left">
                 <thead className="bg-gray-50 dark:bg-[#172330] text-gray-500 dark:text-[#AAB5C2] border-b border-gray-200 dark:border-[rgba(160,180,195,0.14)]">
                   <tr>
-                    <th className="py-3 px-4">VEGETATIVE ECOSYSTEM</th>
-                    <th className="py-3 px-4">OPTICAL SEVERITY (dNBR)</th>
+                    <th className="py-3 px-4">SOURCE</th>
+                    <th className="py-3 px-4">INDICATOR</th>
                     <th className="py-3 px-4">RADAR DELTA (Δσ0 VH)</th>
-                    <th className="py-3 px-4">CONCORDANCE LEVEL</th>
-                    <th className="py-3 px-4">GEOMORPHIC INTERPRETATION</th>
+                    <th className="py-3 px-4">PHASE / UNIT</th>
+                    <th className="py-3 px-4">MEAN / MEDIAN / VALID PIXELS</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100 dark:divide-gray-800 text-[#18191D] dark:text-[#F3F6F8]">
-                  <tr>
-                    <td className="py-3.5 px-4 font-semibold">Chaparral / Coastal Sage</td>
-                    <td className="py-3.5 px-4 text-[#F06468] font-bold">High (+0.52)</td>
-                    <td className="py-3.5 px-4 text-[#F06468] font-bold">Severe (-6.8 dB)</td>
-                    <td className="py-3.5 px-4">
-                      <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-[#43C99A] font-semibold">
-                        High (92%)
-                      </span>
-                    </td>
-                    <td className="py-3.5 px-4 text-[#626873] dark:text-[#AAB5C2]">
-                      Total consumption of shrub layer
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="py-3.5 px-4 font-semibold">Redwood Canyon Bottoms</td>
-                    <td className="py-3.5 px-4 text-[#F28C45] font-bold">Moderate (+0.38)</td>
-                    <td className="py-3.5 px-4 text-emerald-600 dark:text-[#43C99A] font-bold">
-                      Low (-1.8 dB)
-                    </td>
-                    <td className="py-3.5 px-4">
-                      <span className="px-2.5 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-[#E9B75C] font-semibold">
-                        Discrepancy (48%)
-                      </span>
-                    </td>
-                    <td className="py-3.5 px-4 text-[#626873] dark:text-[#AAB5C2]">
-                      Ground fire only; trunks survived
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="py-3.5 px-4 font-semibold">Mixed Oak / Madrone Woodland</td>
-                    <td className="py-3.5 px-4 text-[#F06468] font-bold">High (+0.48)</td>
-                    <td className="py-3.5 px-4 text-[#F28C45] font-bold">Moderate (-4.2 dB)</td>
-                    <td className="py-3.5 px-4">
-                      <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-[#43C99A] font-semibold">
-                        Moderate (74%)
-                      </span>
-                    </td>
-                    <td className="py-3.5 px-4 text-[#626873] dark:text-[#AAB5C2]">
-                      Canopy scorch with partial limb survival
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="py-3.5 px-4 font-semibold">North-Facing Shadowed Slopes</td>
-                    <td className="py-3.5 px-4 text-gray-500 dark:text-gray-400 font-bold">
-                      Low (+0.18)
-                    </td>
-                    <td className="py-3.5 px-4 text-[#F28C45] font-bold">Moderate (-3.9 dB)</td>
-                    <td className="py-3.5 px-4">
-                      <span className="px-2.5 py-0.5 rounded-full bg-purple-100 dark:bg-purple-950/60 text-purple-800 dark:text-[#A48DEB] font-semibold">
-                        Radar Advantage
-                      </span>
-                    </td>
-                    <td className="py-3.5 px-4 text-[#626873] dark:text-[#AAB5C2]">
-                      Radar unaffected by topographic shadow
-                    </td>
-                  </tr>
+                  {phaseObservations.map((row, index) => (
+                    <tr key={`${String(row.source)}-${String(row.layer)}-${String(row.phase)}-${index}`}>
+                      <td className="py-3.5 px-4 font-semibold">{String(row.source)}{row.provisional ? ' · provisional' : ''}</td>
+                      <td className="py-3.5 px-4">{String(row.layer)} ({String(row.units)})</td>
+                      <td className="py-3.5 px-4">{String(row.phase)}</td>
+                      <td className="py-3.5 px-4 font-bold">{Number(row.mean).toFixed(3)} / {Number(row.median).toFixed(3)} / {Number(row.valid_pixels).toLocaleString()}</td>
+                      <td className="py-3.5 px-4">{row.mean_observation_count == null ? '—' : Number(row.mean_observation_count).toFixed(2)}</td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>

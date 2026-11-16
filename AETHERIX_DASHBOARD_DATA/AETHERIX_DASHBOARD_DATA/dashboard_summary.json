@@ -1,0 +1,153 @@
+{
+  "project": "AETHERIX",
+  "generated_utc": "2026-11-16T02:39:52.931556+00:00",
+  "fires": {
+    "timber": {
+      "name": "Timber Fire",
+      "ignition_date": "2026-08-08",
+      "crs": "EPSG:32610",
+      "resolution_m": 20,
+      "grid_width": 763,
+      "grid_height": 623,
+      "aoi_pixels": 257489,
+      "common_valid_score_pixels": 256495,
+      "common_valid_score_percent": 99.61,
+      "screening_score": {
+        "valid_pixels": 256495,
+        "min": 0.0,
+        "max": 100.0,
+        "mean": 44.71983337402344,
+        "median": 43.85712814331055
+      },
+      "dNBR": {
+        "valid_pixels": 257403,
+        "min": -0.36497020721435547,
+        "max": 1.4282562732696533,
+        "mean": 0.5141764283180237,
+        "median": 0.49021264910697937
+      },
+      "NDVI_loss": {
+        "valid_pixels": 257403,
+        "min": -0.3778272271156311,
+        "max": 0.8688362836837769,
+        "mean": 0.32102012634277344,
+        "median": 0.321424275636673
+      },
+      "NDMI_loss": {
+        "valid_pixels": 257403,
+        "min": -0.16056984663009644,
+        "max": 1.127577543258667,
+        "mean": 0.367760568857193,
+        "median": 0.3521174490451813
+      },
+      "NISAR_HH_change": {
+        "valid_pixels": 256581,
+        "min": -7.225142478942871,
+        "max": 9.769500732421875,
+        "mean": 0.38814085721969604,
+        "median": 0.3994112014770508
+      },
+      "NISAR_HV_change": {
+        "valid_pixels": 256581,
+        "min": -9.899063110351562,
+        "max": 8.364801406860352,
+        "mean": -0.1572154015302658,
+        "median": -0.02546405792236328
+      }
+    },
+    "plaskett": {
+      "name": "Plaskett Fire",
+      "ignition_date": "2026-08-26",
+      "crs": "EPSG:32610",
+      "resolution_m": 20,
+      "grid_width": 758,
+      "grid_height": 613,
+      "aoi_pixels": 303457,
+      "common_valid_score_pixels": 302911,
+      "common_valid_score_percent": 99.82,
+      "screening_score": {
+        "valid_pixels": 302911,
+        "min": 0.0,
+        "max": 99.66858673095703,
+        "mean": 45.06188201904297,
+        "median": 45.24155807495117
+      },
+      "dNBR": {
+        "valid_pixels": 303457,
+        "min": -0.20128661394119263,
+        "max": 1.2896603345870972,
+        "mean": 0.4863613247871399,
+        "median": 0.4779402017593384
+      },
+      "NDVI_loss": {
+        "valid_pixels": 303457,
+        "min": -0.19841909408569336,
+        "max": 0.8244004249572754,
+        "mean": 0.34021151065826416,
+        "median": 0.3556765913963318
+      },
+      "NDMI_loss": {
+        "valid_pixels": 303457,
+        "min": -0.15317237377166748,
+        "max": 0.9603487849235535,
+        "mean": 0.29780659079551697,
+        "median": 0.29443731904029846
+      },
+      "NISAR_HH_change": {
+        "valid_pixels": 302911,
+        "min": -11.6873197555542,
+        "max": 9.771312713623047,
+        "mean": -1.1599820852279663,
+        "median": -0.7941160202026367
+      },
+      "NISAR_HV_change": {
+        "valid_pixels": 302911,
+        "min": -13.196380615234375,
+        "max": 5.2663068771362305,
+        "mean": -1.9753708839416504,
+        "median": -1.3795433044433594
+      }
+    }
+  },
+  "fire_comparison": [
+    {
+      "fire": "timber",
+      "name": "Timber Fire",
+      "ignition_date": "2026-08-08",
+      "aoi_pixels": 257489,
+      "valid_score_pixels": 256495,
+      "valid_score_percent": 99.61,
+      "mean_dNBR": 0.5141764283180237,
+      "mean_NDVI_loss": 0.32102012634277344,
+      "mean_NDMI_loss": 0.367760568857193,
+      "mean_HH_change_dB": 0.38814085721969604,
+      "mean_HV_change_dB": -0.1572154015302658,
+      "mean_screening_score": 44.71983337402344
+    },
+    {
+      "fire": "plaskett",
+      "name": "Plaskett Fire",
+      "ignition_date": "2026-08-26",
+      "aoi_pixels": 303457,
+      "valid_score_pixels": 302911,
+      "valid_score_percent": 99.82,
+      "mean_dNBR": 0.4863613247871399,
+      "mean_NDVI_loss": 0.34021151065826416,
+      "mean_NDMI_loss": 0.29780659079551697,
+      "mean_HH_change_dB": -1.1599820852279663,
+      "mean_HV_change_dB": -1.9753708839416504,
+      "mean_screening_score": 45.06188201904297
+    }
+  ],
+  "total_layers": 22,
+  "notes": [
+    "NISAR inputs are provisional GCOV products.",
+    "Validated and provisional NISAR products are not combined.",
+    "GCOV HH/HV diagonal terms represent gamma-zero backscatter, not coherence or displacement.",
+    "NISAR backscatter changes are not direct measurements of burn severity.",
+    "dNBR is a spectral change indicator and has not been field-calibrated as burn severity.",
+    "The screening index is a relative multi-source screening indicator, not a probability.",
+    "Elevation and slope are resampled from the source terrain raster to the 20 m analysis grid.",
+    "The analysis grid is aligned within each fire AOI; the two fire grids are independent."
+  ]
+}
