@@ -328,6 +328,18 @@ Open:
 http://localhost:8080
 ```
 
+### Deploy the API for Vercel
+
+The Vercel frontend needs a separately hosted API. The Render Blueprint in `render.yaml` deploys the FastAPI backend and includes the processed data in its Docker image.
+
+1. Push the repository changes to GitHub.
+2. In Render, choose **New → Blueprint**, connect this repository, and apply the `render.yaml` configuration.
+3. After the service is live, open its `/healthz` URL and confirm it returns `"status":"ok"` and `"data_available":true`.
+4. In Vercel, open the project settings and add `VITE_API_BASE_URL` with the Render service's base URL (no trailing slash). Set it for Production and any Preview environments you use.
+5. Redeploy the Vercel frontend.
+
+The Render service allows the production Vercel origin through `CORS_ORIGINS`. If you use a different frontend domain, update that variable in Render to include the domain's origin, then redeploy the API.
+
 Direct dashboard routes should work through the Nginx single-page-application fallback:
 
 ```text

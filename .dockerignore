@@ -4,6 +4,7 @@ dist-ssr
 .env.local
 .env.*.local
 extracted/
+AETHERIX_DASHBOARD_DATA.zip
 .git
 .gitignore
 *.log

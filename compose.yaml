@@ -2,7 +2,8 @@ services:
   geospatial-api:
     container_name: aetherix-geospatial-api
     build:
-      context: ./backend
+      context: .
+      dockerfile: backend/Dockerfile
     environment:
       DATA_ROOT: /data
       CORS_ORIGINS: http://localhost:8080,http://localhost:5173
