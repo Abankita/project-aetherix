@@ -145,15 +145,15 @@ export const FeedbackForm: React.FC = () => {
           </div>
         </div>
       ) : (
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="p-3 bg-blue-50/70 dark:bg-[#172330] rounded-xl border border-blue-200/60 dark:border-[rgba(160,180,195,0.14)] text-xs text-[#626873] dark:text-[#AAB5C2] leading-relaxed">
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div className="p-3.5 bg-blue-50/70 dark:bg-[#172330] rounded-xl border border-blue-200/60 dark:border-[rgba(160,180,195,0.14)] text-xs sm:text-sm text-[#4B5563] dark:text-[#AAB5C2] leading-relaxed">
             All feedback is directed to consortium research calibration channels. Comments will
             not be displayed on a public feed.
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <div>
-              <label className="block text-xs font-mono uppercase tracking-wider text-gray-500 dark:text-[#AAB5C2] mb-1.5">
+              <label className="block text-xs sm:text-sm font-mono uppercase tracking-wider text-gray-700 dark:text-[#CBD5E1] font-semibold mb-2">
                 Name (Optional)
               </label>
               <input
@@ -161,18 +161,18 @@ export const FeedbackForm: React.FC = () => {
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 placeholder="Anonymous or your name"
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-[rgba(160,180,195,0.18)] text-sm bg-gray-50/60 dark:bg-[#172330] text-[#18191D] dark:text-[#F3F6F8] dark:placeholder-gray-500 focus:outline-none focus:border-[#36C5D9] focus:ring-2 focus:ring-[#36C5D9]/20"
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-[rgba(160,180,195,0.18)] text-base bg-gray-50/60 dark:bg-[#172330] text-[#18191D] dark:text-[#F3F6F8] dark:placeholder-gray-500 focus:outline-none focus:border-[#36C5D9] focus:ring-2 focus:ring-[#36C5D9]/20"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-mono uppercase tracking-wider text-gray-500 dark:text-[#AAB5C2] mb-1.5">
+              <label className="block text-xs sm:text-sm font-mono uppercase tracking-wider text-gray-700 dark:text-[#CBD5E1] font-semibold mb-2">
                 Feedback Category <span className="text-red-500">*</span>
               </label>
               <select
                 value={formData.category}
                 onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-[rgba(160,180,195,0.18)] text-sm bg-gray-50/60 dark:bg-[#172330] text-[#18191D] dark:text-[#F3F6F8] focus:outline-none focus:border-[#36C5D9] focus:ring-2 focus:ring-[#36C5D9]/20"
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-[rgba(160,180,195,0.18)] text-base bg-gray-50/60 dark:bg-[#172330] text-[#18191D] dark:text-[#F3F6F8] focus:outline-none focus:border-[#36C5D9] focus:ring-2 focus:ring-[#36C5D9]/20"
               >
                 {categories.map((cat) => (
                   <option key={cat} value={cat} className="dark:bg-[#111C28]">
@@ -184,7 +184,7 @@ export const FeedbackForm: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-xs font-mono uppercase tracking-wider text-gray-500 dark:text-[#AAB5C2] mb-2">
+            <label className="block text-xs sm:text-sm font-mono uppercase tracking-wider text-gray-700 dark:text-[#CBD5E1] font-semibold mb-2">
               Scientific Quality Rating <span className="text-red-500">*</span>
             </label>
             <div className="flex items-center gap-2">
@@ -197,7 +197,7 @@ export const FeedbackForm: React.FC = () => {
                   aria-label={`${star} Star`}
                 >
                   <Star
-                    className={`w-6 h-6 transition-colors pointer-events-none ${
+                    className={`w-7 h-7 transition-colors pointer-events-none ${
                       star <= formData.rating
                         ? 'fill-amber-400 text-amber-400'
                         : 'text-gray-300 dark:text-gray-600'
@@ -205,14 +205,14 @@ export const FeedbackForm: React.FC = () => {
                   />
                 </button>
               ))}
-              <span className="text-xs font-mono text-[#626873] dark:text-[#AAB5C2] ml-2 font-medium">
+              <span className="text-xs sm:text-sm font-mono text-[#4B5563] dark:text-[#AAB5C2] ml-2 font-medium">
                 {formData.rating} of 5 Stars
               </span>
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-mono uppercase tracking-wider text-gray-500 dark:text-[#AAB5C2] mb-1.5">
+            <label className="block text-xs sm:text-sm font-mono uppercase tracking-wider text-gray-700 dark:text-[#CBD5E1] font-semibold mb-2">
               Comment / Feedback Message <span className="text-red-500">*</span>
             </label>
             <textarea
@@ -220,28 +220,28 @@ export const FeedbackForm: React.FC = () => {
               value={formData.comment}
               onChange={(e) => setFormData({ ...formData, comment: e.target.value })}
               placeholder="Share your suggestions, field calibration feedback, or interface observations..."
-              className={`w-full px-4 py-2.5 rounded-xl border text-sm bg-gray-50/60 dark:bg-[#172330] text-[#18191D] dark:text-[#F3F6F8] dark:placeholder-gray-500 focus:outline-none focus:ring-2 transition-all ${
+              className={`w-full px-4 py-3 rounded-xl border text-base bg-gray-50/60 dark:bg-[#172330] text-[#18191D] dark:text-[#F3F6F8] dark:placeholder-gray-500 focus:outline-none focus:ring-2 transition-all ${
                 errors.comment
                   ? 'border-red-400 focus:ring-red-300'
                   : 'border-gray-200 dark:border-[rgba(160,180,195,0.18)] focus:border-[#36C5D9] focus:ring-[#36C5D9]/20'
               }`}
             />
             {errors.comment && (
-              <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
-                <AlertCircle className="w-3 h-3" />
+              <p className="text-xs sm:text-sm text-red-500 mt-1 flex items-center gap-1 font-mono">
+                <AlertCircle className="w-3.5 h-3.5" />
                 {errors.comment}
               </p>
             )}
           </div>
 
           <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <span className="text-xs text-gray-400 dark:text-[#788796] font-mono">
+            <span className="text-xs sm:text-sm text-gray-500 dark:text-[#AAB5C2] font-mono">
               Consortium private review channel (Resend relay)
             </span>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-full bg-[#18191D] hover:bg-black dark:bg-[#36C5D9] dark:text-[#0B1118] dark:hover:bg-[#22B8C7] text-white font-medium text-xs uppercase tracking-wider transition-all shadow-sm active:scale-95 disabled:opacity-50 cursor-pointer"
+              className="inline-flex items-center justify-center gap-2.5 px-7 py-3 rounded-full bg-[#18191D] hover:bg-black dark:bg-[#36C5D9] dark:text-[#0B1118] dark:hover:bg-[#22B8C7] text-white font-bold text-sm uppercase tracking-wider transition-all shadow-md active:scale-95 disabled:opacity-50 cursor-pointer"
             >
               {isSubmitting ? (
                 <>

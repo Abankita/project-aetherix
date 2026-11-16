@@ -21,6 +21,7 @@ interface InteractiveMapProps {
   className?: string;
   height?: string;
   interactive?: boolean;
+  showInternalControls?: boolean;
 }
 
 // In-memory cache for GeoJSON to guarantee instant loading without network failures
@@ -39,11 +40,13 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
   className = '',
   height = '540px',
   interactive = true,
+  showInternalControls = true,
 }) => {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
   const isFirstMount = useRef(true);
   const [loading, setLoading] = useState(true);
+  const [hasWebGlError, setHasWebGlError] = useState(false);
   const { isDark } = useTheme();
 
   // Basemap provider state: defaults to clean live 'osm'
@@ -185,38 +188,48 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
   useEffect(() => {
     if (!mapContainerRef.current) return;
 
-    const initialStyle = MapService.getMapStyle(provider, isDark);
+    try {
+      const initialStyle = MapService.getMapStyle(provider, isDark);
 
-    const map = new maplibregl.Map({
-      container: mapContainerRef.current,
-      style: initialStyle,
-      center: center,
-      zoom: zoom,
-      maxZoom: 18,
-      minZoom: 2, // Allow zooming out freely across California and coastal region
-      interactive: interactive,
-      attributionControl: false,
-    });
+      const map = new maplibregl.Map({
+        container: mapContainerRef.current,
+        style: initialStyle,
+        center: center,
+        zoom: zoom,
+        maxZoom: 18,
+        minZoom: 2, // Allow zooming out freely across California and coastal region
+        interactive: interactive,
+        attributionControl: false,
+      });
 
-    if (interactive) {
-      map.addControl(new maplibregl.NavigationControl({ showCompass: true }), 'top-right');
-      map.addControl(new maplibregl.AttributionControl({ compact: true }), 'bottom-right');
+      if (interactive) {
+        map.addControl(new maplibregl.NavigationControl({ showCompass: true }), 'top-right');
+        map.addControl(new maplibregl.AttributionControl({ compact: true }), 'bottom-right');
+      }
+
+      mapRef.current = map;
+
+      const handleAddVectors = () => {
+        addVectorLayers(map);
+      };
+
+      map.on('load', handleAddVectors);
+      map.on('styledata', () => {
+        if (map.isStyleLoaded()) {
+          addVectorLayers(map);
+        }
+      });
+
+      return () => {
+        map.off('load', handleAddVectors);
+        map.remove();
+        mapRef.current = null;
+      };
+    } catch (err) {
+      console.warn('MapLibre WebGL initialization note:', err);
+      setHasWebGlError(true);
+      setLoading(false);
     }
-
-    mapRef.current = map;
-
-    map.on('load', () => {
-      addVectorLayers(map);
-    });
-
-    map.on('style.load', () => {
-      addVectorLayers(map);
-    });
-
-    return () => {
-      map.remove();
-      mapRef.current = null;
-    };
   }, []);
 
   // Update style when theme (Light/Dark) or Provider changes, skipping first mount
@@ -340,6 +353,14 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
     }
   };
 
+  // Safety fallback for loading overlay to ensure it never hangs
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 800);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <div
       className={`relative w-full rounded-2xl overflow-hidden border border-gray-200/80 dark:border-[rgba(160,180,195,0.14)] shadow-md ${
@@ -362,8 +383,26 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
       {/* MapLibre DOM Target */}
       <div ref={mapContainerRef} className="w-full h-full" />
 
+      {/* WebGL Fallback if WebGL is unavailable in headless or older environment */}
+      {hasWebGlError && (
+        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-[#EAE8E4] dark:bg-[#111C28] p-6 text-center">
+          <div className="w-12 h-12 rounded-full bg-[#478ED8]/10 text-[#478ED8] flex items-center justify-center mb-3">
+            <Layers className="w-6 h-6" />
+          </div>
+          <div className="text-sm font-semibold text-[#191A1F] dark:text-[#F3F6F8]">
+            Monterey County Geospatial Boundary
+          </div>
+          <div className="text-xs text-[#6B7280] dark:text-[#AAB5C2] mt-1 font-mono">
+            36.2704° N, 121.8081° W · Big Sur Study Area
+          </div>
+          <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white dark:bg-[#172330] text-xs font-mono text-[#478ED8] border border-[#E9E7E5] dark:border-gray-700 shadow-2xs">
+            11 Monitored HUC-12 Basins · 2 Fire Complexes
+          </div>
+        </div>
+      )}
+
       {/* Top Left: Map Style / AOI Pill matching reference screenshot */}
-      {interactive && (
+      {interactive && showInternalControls && (
         <div className="absolute top-4 left-4 z-10 flex flex-wrap items-center gap-2 pointer-events-auto">
           <button
             onClick={toggleProvider}
@@ -389,28 +428,32 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
       )}
 
       {/* Top Right: Map Provider Status Callout */}
-      <div className="absolute top-4 right-14 z-10 hidden sm:flex items-center gap-1.5 bg-amber-50/95 dark:bg-[#121418]/85 backdrop-blur-md px-3 py-1 rounded-full border border-amber-300 dark:border-amber-400/30 text-[10px] font-mono text-amber-900 dark:text-amber-200 pointer-events-none shadow-xs">
-        <span className="w-1.5 h-1.5 rounded-full bg-amber-500 dark:bg-amber-400 animate-pulse"></span>
-        <span>Awaiting MapTiler API Key in .env.local</span>
-      </div>
+      {showInternalControls && (
+        <div className="absolute top-4 right-14 z-10 hidden sm:flex items-center gap-1.5 bg-amber-50/95 dark:bg-[#121418]/85 backdrop-blur-md px-3 py-1 rounded-full border border-amber-300 dark:border-amber-400/30 text-[10px] font-mono text-amber-900 dark:text-amber-200 pointer-events-none shadow-xs">
+          <span className="w-1.5 h-1.5 rounded-full bg-amber-500 dark:bg-amber-400 animate-pulse"></span>
+          <span>Awaiting MapTiler API Key in .env.local</span>
+        </div>
+      )}
 
       {/* Bottom Left: Exact Legend Pill from reference screenshot */}
-      <div className="absolute bottom-4 left-4 z-10 flex flex-wrap items-center gap-2.5 bg-white/95 dark:bg-[#121418]/90 backdrop-blur-md px-3.5 py-1.5 rounded-xl border border-gray-200/90 dark:border-white/20 text-[11px] font-mono text-[#18191D] dark:text-white shadow-md pointer-events-auto">
-        <div className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded bg-[#F49A48] border border-amber-600/30 dark:border-white/40"></span>
-          <span>Timber Fire (Orange)</span>
+      {showInternalControls && (
+        <div className="absolute bottom-4 left-4 z-10 flex flex-wrap items-center gap-2.5 bg-white/95 dark:bg-[#121418]/90 backdrop-blur-md px-3.5 py-1.5 rounded-xl border border-gray-200/90 dark:border-white/20 text-[11px] font-mono text-[#18191D] dark:text-white shadow-md pointer-events-auto">
+          <div className="flex items-center gap-1.5">
+            <span className="w-2.5 h-2.5 rounded bg-[#F49A48] border border-amber-600/30 dark:border-white/40"></span>
+            <span>Timber Fire (Orange)</span>
+          </div>
+          <span className="text-gray-300 dark:text-gray-600">·</span>
+          <div className="flex items-center gap-1.5">
+            <span className="w-2.5 h-2.5 rounded bg-[#F06470] border border-rose-600/30 dark:border-white/40"></span>
+            <span>Plaskett Fire (Red)</span>
+          </div>
+          <span className="text-gray-300 dark:text-gray-600">·</span>
+          <div className="flex items-center gap-1.5">
+            <span className="w-2.5 h-2.5 rounded bg-[#29C9D2] border border-teal-600/30 dark:border-white/40"></span>
+            <span>HUC-12 Basins (Cyan)</span>
+          </div>
         </div>
-        <span className="text-gray-300 dark:text-gray-600">·</span>
-        <div className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded bg-[#F06470] border border-rose-600/30 dark:border-white/40"></span>
-          <span>Plaskett Fire (Red)</span>
-        </div>
-        <span className="text-gray-300 dark:text-gray-600">·</span>
-        <div className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded bg-[#29C9D2] border border-teal-600/30 dark:border-white/40"></span>
-          <span>HUC-12 Basins (Cyan)</span>
-        </div>
-      </div>
+      )}
     </div>
   );
 };
