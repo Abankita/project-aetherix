@@ -36,11 +36,11 @@ export const DashboardSatellitePage: React.FC = () => {
   const [temporalLayer, setTemporalLayer] = useState<'pre-nbr' | 'post-nbr' | 'dnbr'>('dnbr');
 
   // Optical side layer (Cross-sensor left map)
-  const [opticalLayer, setOpticalLayer] = useState<'natural' | 'false' | 'NDVI' | 'NDMI' | 'NBR' | 'dnbr'>('dnbr');
+  const [opticalLayer, setOpticalLayer] = useState<'natural' | 'false' | 'NDVI' | 'NDMI' | 'NBR' | 'dnbr'>('natural');
   const [opticalPhase, setOpticalPhase] = useState<'pre' | 'during' | 'post'>('post');
 
   // Radar side layer (Cross-sensor right map)
-  const [radarLayer, setRadarLayer] = useState<'pre-sar' | 'during-sar' | 'post-sar' | 'during-change' | 'sar-change' | 'pre-count' | 'during-count' | 'post-count'>('sar-change');
+  const [radarLayer, setRadarLayer] = useState<'pre-sar' | 'during-sar' | 'post-sar' | 'during-change' | 'sar-change' | 'pre-count' | 'during-count' | 'post-count'>('post-sar');
 
   // The processed package contains HH and HV gamma-zero backscatter products.
   const [polarization, setPolarization] = useState<'HH' | 'HV'>('HV');
@@ -340,9 +340,9 @@ export const DashboardSatellitePage: React.FC = () => {
           )}
 
           {/* SIDE-BY-SIDE SYNCHRONIZED MAP VIEW */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className={`grid grid-cols-1 ${analysisMode === 'combined' ? 'lg:grid-cols-2' : ''} gap-6`}>
             {/* LEFT MAP: SENTINEL-2 OPTICAL */}
-            <div className="p-5 rounded-3xl bg-white dark:bg-[#111C28] border border-gray-200/80 dark:border-[rgba(160,180,195,0.14)] shadow-xs space-y-4">
+            {analysisMode !== 'radar' && <div className={`p-5 rounded-3xl bg-white dark:bg-[#111C28] border border-gray-200/80 dark:border-[rgba(160,180,195,0.14)] shadow-xs space-y-4 ${analysisMode === 'optical' ? 'lg:col-span-2' : ''}`}>
               <div className="flex flex-wrap items-center justify-between gap-2 border-b border-gray-100 dark:border-[rgba(160,180,195,0.1)] pb-3">
                 <div>
                   <div className="flex items-center gap-2">
@@ -380,10 +380,10 @@ export const DashboardSatellitePage: React.FC = () => {
                 <span>{getRaster('optical')?.name || 'Sentinel-2 optical layer'} · {getRaster('optical')?.units || 'unitless'}</span>
                 <span>Display {getRaster('optical')?.visualization.min ?? '—'}–{getRaster('optical')?.visualization.max ?? '—'} · {getRaster('optical')?.resolution?.[0] || 20} m</span>
               </div>
-            </div>
+            </div>}
 
             {/* RIGHT MAP: NISAR L-BAND RADAR */}
-            <div className="p-5 rounded-3xl bg-white dark:bg-[#111C28] border border-gray-200/80 dark:border-[rgba(160,180,195,0.14)] shadow-xs space-y-4">
+            {analysisMode !== 'optical' && <div className={`p-5 rounded-3xl bg-white dark:bg-[#111C28] border border-gray-200/80 dark:border-[rgba(160,180,195,0.14)] shadow-xs space-y-4 ${analysisMode === 'radar' ? 'lg:col-span-2' : ''}`}>
               <div className="flex flex-wrap items-center justify-between gap-2 border-b border-gray-100 dark:border-[rgba(160,180,195,0.1)] pb-3">
                 <div>
                   <div className="flex items-center gap-2">
@@ -422,7 +422,7 @@ export const DashboardSatellitePage: React.FC = () => {
                 <span>{getRaster('radar')?.name || 'NISAR backscatter'} · gamma-zero dB</span>
                 <span>{getRaster('radar')?.units === 'count' ? `Observation counts · display ${getRaster('radar')?.visualization.min ?? '—'}–${getRaster('radar')?.visualization.max ?? '—'}` : `Provisional NISAR · display ${getRaster('radar')?.visualization.min ?? '—'}–${getRaster('radar')?.visualization.max ?? '—'} dB`}</span>
               </div>
-            </div>
+            </div>}
           </div>
 
           {/* Concordance Interpretation & Dual-Sensor Summary */}

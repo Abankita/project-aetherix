@@ -2,7 +2,7 @@ import maplibregl from 'maplibre-gl';
 import { DATA_SOURCES } from '@/config/dataSources';
 import { MAP_THEME } from '@/config/mapTheme';
 
-export type BasemapProvider = 'carto' | 'osm';
+export type BasemapProvider = 'imagery' | 'carto' | 'osm';
 export type MapViewStyle = 'standard' | 'dark' | 'satellite' | 'hybrid';
 
 export class MapService {
@@ -35,61 +35,31 @@ export class MapService {
     return this.getCartoKey() !== null;
   }
 
-  /**
-   * Generates the MapLibre style specification.
-   * Defaults to clean universal provider (zero watermarks),
-   * with full support for both Light Theme and Dark Theme (Midnight Geospatial).
-   */
-  static getMapStyle(provider: BasemapProvider = 'osm', isDark: boolean = true): maplibregl.StyleSpecification {
+  /** Generates realistic imagery by default, with CARTO and OSM map alternatives. */
+  static getMapStyle(provider: BasemapProvider = 'carto', isDark: boolean = true): maplibregl.StyleSpecification {
     const bgColor = isDark ? MAP_THEME.basemap.backgroundColor : '#F3F6F8';
-    const mapTilerKey = this.getMapTilerKey();
+    const cartoKey = this.getCartoKey();
+    const useImagery = provider === 'imagery';
+    const useCarto = provider === 'carto' && cartoKey !== null;
+    const tiles = useImagery
+      ? 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
+      : useCarto
+      ? `https://basemaps.cartocdn.com/rastertiles/${isDark ? 'dark_all' : 'light_all'}/{z}/{x}/{y}.png?key=${encodeURIComponent(cartoKey || '')}`
+      : 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+    const attribution = useImagery
+      ? 'Sources: Esri, Maxar, Earthstar Geographics, and the GIS User Community'
+      : useCarto
+      ? '© CARTO · © OpenStreetMap contributors'
+      : '© OpenStreetMap contributors';
 
-    // 1. If MapTiler key is configured, use official MapTiler vector or raster style
-    if (mapTilerKey) {
-      const styleId = isDark ? 'ch-swisstopo-lbm-dark' : 'outdoor-v2';
-      return {
-        version: 8,
-        sources: {
-          'maptiler-tiles': {
-            type: 'raster',
-            tiles: [
-              `https://api.maptiler.com/maps/${styleId}/256/{z}/{x}/{y}.png?key=${encodeURIComponent(mapTilerKey)}`,
-            ],
-            tileSize: 256,
-            attribution: '© MapTiler · © OpenStreetMap contributors',
-          },
-        },
-        layers: [
-          {
-            id: 'background',
-            type: 'background',
-            paint: {
-              'background-color': bgColor,
-            },
-          },
-          {
-            id: 'maptiler-layer',
-            type: 'raster',
-            source: 'maptiler-tiles',
-            minzoom: 0,
-            maxzoom: 19,
-          },
-        ],
-      };
-    }
-
-    // 2. OpenStreetMap Provider (Clean, zero watermarks, 100% reliable)
-    // Restored exact original color combination
     return {
       version: 8,
       sources: {
-        'osm-tiles': {
+        'basemap-tiles': {
           type: 'raster',
-          tiles: [
-            'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-          ],
+          tiles: [tiles],
           tileSize: 256,
-          attribution: '© OpenStreetMap contributors',
+          attribution,
         },
       },
       layers: [
@@ -101,12 +71,12 @@ export class MapService {
           },
         },
         {
-          id: 'osm-layer',
+          id: 'basemap-layer',
           type: 'raster',
-          source: 'osm-tiles',
+          source: 'basemap-tiles',
           minzoom: 0,
           maxzoom: 19,
-          paint: isDark
+          paint: !useImagery && !useCarto && isDark
             ? {
                 'raster-saturation': -0.85,
                 'raster-contrast': 0.25,
@@ -143,6 +113,27 @@ export class MapService {
         essential: true,
       });
     }
+  }
+
+  static fitToFireGeoJson(
+    map: maplibregl.Map,
+    collection: { features?: Array<{ properties?: Record<string, unknown>; geometry?: { coordinates?: unknown } }> } | null,
+    fireId: 'timber' | 'plaskett',
+  ) {
+    const features = collection?.features?.filter((feature) => feature.properties?.id === fireId) ?? [];
+    const bounds = new maplibregl.LngLatBounds();
+    const addCoordinates = (coordinates: unknown) => {
+      if (!Array.isArray(coordinates)) return;
+      if (coordinates.length >= 2 && typeof coordinates[0] === 'number' && typeof coordinates[1] === 'number') {
+        bounds.extend([coordinates[0], coordinates[1]]);
+        return;
+      }
+      coordinates.forEach(addCoordinates);
+    };
+
+    features.forEach((feature) => addCoordinates(feature.geometry?.coordinates));
+    if (!bounds.isEmpty()) map.fitBounds(bounds, { padding: 64, maxZoom: 12.5, duration: 800 });
+    else this.flyToFire(map, fireId);
   }
 
   static flyToCoordinates(map: maplibregl.Map, center: [number, number], zoom: number = 11.8) {

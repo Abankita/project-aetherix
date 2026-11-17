@@ -54,16 +54,18 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
   const rasterLayerRef = useRef<RasterLayer | null>(rasterLayer);
   const rasterOpacityRef = useRef(rasterOpacity);
   const rasterBandsRef = useRef(rasterBands);
+  const selectedFireIdRef = useRef(selectedFireId);
   rasterLayerRef.current = rasterLayer;
   rasterOpacityRef.current = rasterOpacity;
   rasterBandsRef.current = rasterBands;
+  selectedFireIdRef.current = selectedFireId;
   const isFirstMount = useRef(true);
   const [loading, setLoading] = useState(true);
   const [hasWebGlError, setHasWebGlError] = useState(false);
   const { isDark } = useTheme();
 
-  // Basemap provider state: defaults to clean live 'osm'
-  const [provider, setProvider] = useState<BasemapProvider>('osm');
+  // Real aerial imagery is the default; the map control cycles through alternatives.
+  const [provider, setProvider] = useState<BasemapProvider>('imagery');
 
   // Inject vector layers into the map
   const addVectorLayers = useCallback(async (map: maplibregl.Map) => {
@@ -119,41 +121,28 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
           data: cachedFireGeoJson,
         });
 
-        // Fire fill layer
+        // Draw the supplied GeoJSON perimeter without colored fills.
         map.addLayer({
-          id: 'fire-perimeters-fill',
-          type: 'fill',
+          id: 'fire-perimeters-casing',
+          type: 'line',
           source: 'fire-perimeters',
-          paint: {
-            'fill-color': [
-              'case',
-              ['==', ['get', 'id'], 'timber'],
-              MAP_THEME.fires.timber.outline,
-              MAP_THEME.fires.plaskett.outline,
-            ],
-            'fill-opacity': 0.20,
-          },
+          paint: { 'line-color': '#07131A', 'line-width': 4.5, 'line-opacity': 0.78 },
         });
-
-        // Fire outline layer
         map.addLayer({
           id: 'fire-perimeters-line',
           type: 'line',
           source: 'fire-perimeters',
           paint: {
-            'line-color': [
-              'case',
-              ['==', ['get', 'id'], 'timber'],
-              MAP_THEME.fires.timber.outline,
-              MAP_THEME.fires.plaskett.outline,
-            ],
-            'line-width': 2.5,
+            'line-color': '#F8FAFC',
+            'line-width': 2.2,
             'line-opacity': 0.95,
           },
         });
 
+        if (selectedFireIdRef.current !== 'all') MapService.fitToFireGeoJson(map, cachedFireGeoJson, selectedFireIdRef.current);
+
         if (interactive && onSelectFire) {
-          map.on('click', 'fire-perimeters-fill', (e) => {
+          map.on('click', 'fire-perimeters-line', (e) => {
             if (e.features && e.features[0]) {
               const id = e.features[0].properties?.id;
               if (id === 'timber' || id === 'plaskett') {
@@ -162,10 +151,10 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
             }
           });
 
-          map.on('mouseenter', 'fire-perimeters-fill', () => {
+          map.on('mouseenter', 'fire-perimeters-line', () => {
             map.getCanvas().style.cursor = 'pointer';
           });
-          map.on('mouseleave', 'fire-perimeters-fill', () => {
+          map.on('mouseleave', 'fire-perimeters-line', () => {
             map.getCanvas().style.cursor = '';
           });
         }
@@ -326,20 +315,13 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
   // Sync selected fire filtering
   useEffect(() => {
     const map = mapRef.current;
-    if (!map || !map.isStyleLoaded() || !map.getLayer('fire-perimeters-fill')) return;
+    if (!map || !map.isStyleLoaded() || !map.getLayer('fire-perimeters-line')) return;
 
     if (selectedFireId === 'all') {
-      map.setPaintProperty('fire-perimeters-fill', 'fill-opacity', 0.20);
       map.setPaintProperty('fire-perimeters-line', 'line-opacity', 0.95);
       map.setPaintProperty('fire-perimeters-line', 'line-width', 2.5);
       MapService.flyToAOI(map);
     } else {
-      map.setPaintProperty('fire-perimeters-fill', 'fill-opacity', [
-        'case',
-        ['==', ['get', 'id'], selectedFireId],
-        0.35,
-        0.06,
-      ]);
       map.setPaintProperty('fire-perimeters-line', 'line-opacity', [
         'case',
         ['==', ['get', 'id'], selectedFireId],
@@ -352,7 +334,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
         3.5,
         1.5,
       ]);
-      MapService.flyToFire(map, selectedFireId);
+      MapService.fitToFireGeoJson(map, cachedFireGeoJson, selectedFireId);
     }
   }, [selectedFireId]);
 
@@ -406,8 +388,8 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
     const map = mapRef.current;
     if (!map || !map.isStyleLoaded()) return;
 
-    if (map.getLayer('fire-perimeters-fill')) {
-      map.setLayoutProperty('fire-perimeters-fill', 'visibility', showFires ? 'visible' : 'none');
+    if (map.getLayer('fire-perimeters-casing')) {
+      map.setLayoutProperty('fire-perimeters-casing', 'visibility', showFires ? 'visible' : 'none');
       map.setLayoutProperty('fire-perimeters-line', 'visibility', showFires ? 'visible' : 'none');
     }
 
@@ -418,7 +400,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
   }, [showFires, showWatersheds]);
 
   const toggleProvider = () => {
-    setProvider((prev) => (prev === 'carto' ? 'osm' : 'carto'));
+    setProvider((prev) => prev === 'imagery' ? 'carto' : prev === 'carto' ? 'osm' : 'imagery');
   };
 
   const resetView = () => {
@@ -482,11 +464,11 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
             onClick={toggleProvider}
             type="button"
             className="flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-mono font-medium backdrop-blur-md bg-white/95 text-[#18191D] border border-gray-200/90 hover:bg-gray-50 shadow-sm dark:bg-[#121418]/90 dark:text-white dark:border-white/20 dark:hover:bg-[#121418] transition-all cursor-pointer"
-            title="Toggle basemap"
+            title={`Basemap: ${provider}. Click to change.`}
           >
             <Layers className="w-3.5 h-3.5 text-[#29C9D2] pointer-events-none" />
             <span className="pointer-events-none uppercase text-[11px] tracking-wider font-semibold">
-              BIG SUR STUDY AREA · MONTEREY COUNTY, CA
+              {provider === 'imagery' ? 'SATELLITE IMAGERY' : provider === 'carto' ? 'CARTO MAP' : 'OPENSTREETMAP'} · BIG SUR, CA
             </span>
           </button>
 
@@ -505,13 +487,8 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
       {showInternalControls && (
         <div className="absolute bottom-4 left-4 z-10 flex flex-wrap items-center gap-2.5 bg-white/95 dark:bg-[#121418]/90 backdrop-blur-md px-3.5 py-1.5 rounded-xl border border-gray-200/90 dark:border-white/20 text-[11px] font-mono text-[#18191D] dark:text-white shadow-md pointer-events-auto">
           <div className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded bg-[#F49A48] border border-amber-600/30 dark:border-white/40"></span>
-            <span>Timber Fire (Orange)</span>
-          </div>
-          <span className="text-gray-300 dark:text-gray-600">·</span>
-          <div className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded bg-[#F06470] border border-rose-600/30 dark:border-white/40"></span>
-            <span>Plaskett Fire (Red)</span>
+            <span className="w-4 h-0.5 rounded bg-white border border-slate-500"></span>
+            <span>Fire perimeter · supplied GeoJSON</span>
           </div>
           <span className="text-gray-300 dark:text-gray-600">·</span>
           <div className="flex items-center gap-1.5">

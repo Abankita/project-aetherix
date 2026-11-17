@@ -37,9 +37,7 @@ export const DashboardFiresPage: React.FC = () => {
       .then(([layerResponse, summary]) => {
         if (!alive) return;
         setAvailableLayers(layerResponse.layers);
-        setActiveLayerId((current) => current && layerResponse.layers.some((layer) => layer.id === current)
-          ? current
-          : layerResponse.layers.find((layer) => layer.id.endsWith('_screening_score'))?.id || layerResponse.layers.find((layer) => layer.id.endsWith('_dnbr'))?.id || '');
+        setActiveLayerId((current) => current && layerResponse.layers.some((layer) => layer.id === current) ? current : '');
         setSummaries((current) => ({ ...current, [selectedFire]: summary }));
         setDataError('');
       })
@@ -158,6 +156,7 @@ export const DashboardFiresPage: React.FC = () => {
           <div className="flex items-center gap-2 text-xs font-mono">
             <label htmlFor="processed-layer" className="text-gray-500 dark:text-[#AAB5C2]">Processed raster</label>
             <select id="processed-layer" value={activeLayerId} onChange={(event) => setActiveLayerId(event.target.value)} className="max-w-64 px-2 py-1.5 rounded-lg bg-gray-100 dark:bg-[#172330] text-[#18191D] dark:text-[#F3F6F8] border border-gray-200 dark:border-gray-700">
+              <option value="">Satellite imagery · GeoJSON perimeter</option>
               {availableLayers.map((layer) => <option key={layer.id} value={layer.id}>[{layer.category}] {layer.name}</option>)}
             </select>
             <input aria-label="Raster opacity" type="range" min="0" max="1" step="0.05" value={rasterOpacity} onChange={(event) => setRasterOpacity(Number(event.target.value))} />

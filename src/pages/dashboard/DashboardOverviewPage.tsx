@@ -29,9 +29,7 @@ export const DashboardOverviewPage: React.FC = () => {
         if (!active) return;
         setSummary(fireSummary);
         setLayers(layerData.layers);
-        setSelectedLayerId((current) => current && layerData.layers.some((layer) => layer.id === current)
-          ? current
-          : layerData.layers.find((layer) => layer.id.endsWith('_screening_score'))?.id || layerData.layers.find((layer) => layer.id.endsWith('_dnbr'))?.id || '');
+        setSelectedLayerId((current) => current && layerData.layers.some((layer) => layer.id === current) ? current : '');
         setObservations(series.observations);
         setWatershedCount(watershedData.features.length);
       }).catch(() => active && setSummary(null));
@@ -93,15 +91,12 @@ export const DashboardOverviewPage: React.FC = () => {
               <option value="timber">Timber Fire</option><option value="plaskett">Plaskett Fire</option>
             </select>
             <select aria-label="Map raster layer" value={selectedLayerId} onChange={(event) => setSelectedLayerId(event.target.value)} className="max-w-64 px-2.5 py-1.5 rounded-lg bg-white dark:bg-[#172330] text-[#18191D] dark:text-[#F3F6F8] border border-gray-200 dark:border-gray-700">
+              <option value="">Satellite imagery · GeoJSON perimeter</option>
               {layers.map((layer) => <option key={layer.id} value={layer.id}>{layer.name}</option>)}
             </select>
             <div className="flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded bg-[#F49A48]/80 border border-[#F49A48]"></span>
-              <span className="text-gray-700 dark:text-[#AAB5C2]">Timber boundary</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded bg-[#F06470]/80 border border-[#F06470]"></span>
-              <span className="text-gray-700 dark:text-[#AAB5C2]">Plaskett boundary</span>
+              <span className="w-4 h-0.5 rounded bg-white border border-slate-500"></span>
+              <span className="text-gray-700 dark:text-[#AAB5C2]">Supplied fire perimeter GeoJSON</span>
             </div>
             <div className="hidden sm:flex items-center gap-1.5">
               <span className="w-3 h-3 rounded bg-[#29C9D2]/40 border border-[#29C9D2]"></span>
@@ -121,7 +116,7 @@ export const DashboardOverviewPage: React.FC = () => {
               ['Mean screening index', summary.screening_score.mean.toFixed(2)],
             ].map(([label, value]) => <div key={label} className="p-4 rounded-xl bg-white dark:bg-[#111C28] border border-gray-200 dark:border-gray-800"><div className="text-[11px] font-mono uppercase text-gray-400 dark:text-[#788796]">{label}</div><div className="text-xl font-bold mt-1 font-mono text-[#18191D] dark:text-[#F3F6F8]">{value}</div></div>)}
           </div>
-          <p className="text-xs text-[#626873] dark:text-[#AAB5C2]">{selectedLayer?.name || 'Processed raster'} · {selectedLayer?.units || 'unitless'} · display range {selectedLayer?.visualization.min ?? '—'}–{selectedLayer?.visualization.max ?? '—'}. Valid-data coverage is AOI data coverage, not burned area. The screening index is relative, not a probability.</p>
+          <p className="text-xs text-[#626873] dark:text-[#AAB5C2]">{selectedLayer ? `${selectedLayer.name} · ${selectedLayer.units} · display range ${selectedLayer.visualization.min ?? '—'}–${selectedLayer.visualization.max ?? '—'}.` : 'Satellite imagery with the supplied fire-perimeter GeoJSON overlay.'} Valid-data coverage is AOI data coverage, not burned area. The screening index is relative, not a probability.</p>
           <p className="max-w-4xl text-sm leading-relaxed text-[#626873] dark:text-[#AAB5C2]">In plain terms: AOI pixels are the grid cells inside this study area. Common valid pixels are the cells with usable values across the combined screening inputs. Coverage is the share of the grid with those values; it does not say how much land burned. Read the relative screening index alongside the selected map layer, not as a chance or risk percentage.</p>
         </>}
       </section>
