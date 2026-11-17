@@ -50,9 +50,14 @@ export const aetherixApi = {
   comparison: () => getJson<{ fires: Record<string, string | number>[]; note: string }>('/api/comparison'),
   timeseries: (fire: string) => getJson<{ fire: string; observations: Record<string, unknown>[]; date_fields_available: boolean; nisar_status: string }>(`/api/timeseries/${fire}`),
   watersheds: (fire: string) => getJson<{ type: 'FeatureCollection'; features: Array<{ properties: Record<string, unknown> }> }>(`/api/vectors/${fire}/watersheds`),
-  tileTemplate: (layer: RasterLayer, bands?: number[]) => {
+  tileTemplate: (layer: RasterLayer, bands?: number[], options?: { baseUrl?: string; hillshade?: boolean }) => {
     const rgb = bands || (layer.band_count >= 9 ? [3, 2, 1] : undefined);
-    return `${API_BASE}${layer.tile_url}${rgb ? `?bands=${rgb.join(',')}` : ''}`;
+    const query = new URLSearchParams();
+    if (rgb) query.set('bands', rgb.join(','));
+    if (options?.hillshade) query.set('hillshade', 'true');
+    const queryString = query.toString();
+    const suffix = queryString ? `?${queryString}` : '';
+    return `${options?.baseUrl ?? API_BASE}${layer.tile_url}${suffix}`;
   },
   previewUrl: (fire: string, layer: RasterLayer | undefined, bands?: number[]) => {
     if (!layer) return undefined;

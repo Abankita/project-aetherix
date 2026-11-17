@@ -16,6 +16,7 @@ interface InteractiveMapProps {
   showWatersheds?: boolean;
   showFires?: boolean;
   showSatellite?: boolean;
+  showTerrain?: boolean;
   defaultView?: string;
   onSelectFire?: (id: 'timber' | 'plaskett') => void;
   onSelectWatershed?: (huc12: string) => void;
@@ -26,6 +27,9 @@ interface InteractiveMapProps {
   rasterLayer?: RasterLayer | null;
   rasterOpacity?: number;
   rasterBands?: number[];
+  terrainLayers?: RasterLayer[];
+  underlayLayers?: RasterLayer[];
+  tileApiBase?: string;
 }
 
 // In-memory cache for GeoJSON to guarantee instant loading without network failures
@@ -39,6 +43,8 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
   selectedHuc12 = null,
   showWatersheds = true,
   showFires = true,
+  showSatellite = false,
+  showTerrain = false,
   onSelectFire,
   onSelectWatershed,
   className = '',
@@ -48,6 +54,9 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
   rasterLayer = null,
   rasterOpacity = 0.78,
   rasterBands,
+  terrainLayers = [],
+  underlayLayers = [],
+  tileApiBase,
 }) => {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
@@ -70,13 +79,42 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
   // Inject vector layers into the map
   const addVectorLayers = useCallback(async (map: maplibregl.Map) => {
     try {
+      const syncRasterTiles = (prefix: string, layers: RasterLayer[], visible: boolean, opacity: number, hillshade = false) => {
+        (['timber', 'plaskett'] as const).forEach((fire) => {
+          const id = `${prefix}-${fire}`;
+          if (map.getLayer(id) && typeof map.removeLayer === 'function') map.removeLayer(id);
+          if (map.getSource(id) && typeof map.removeSource === 'function') map.removeSource(id);
+        });
+        layers.forEach((layer) => {
+          const id = `${prefix}-${layer.fire}`;
+          map.addSource(id, {
+            type: 'raster',
+            tiles: [aetherixApi.tileTemplate(layer, undefined, { baseUrl: tileApiBase, hillshade })],
+            tileSize: 256,
+            attribution: hillshade ? 'AETHERIX elevation-derived hillshade' : 'AETHERIX processed 20 m raster data',
+          });
+          map.addLayer({
+            id,
+            type: 'raster',
+            source: id,
+            layout: { visibility: visible ? 'visible' : 'none' },
+            paint: { 'raster-opacity': opacity, 'raster-resampling': 'linear' },
+          });
+        });
+      };
+
       const activeRaster = rasterLayerRef.current;
-      if (map.getLayer('aetherix-processed-raster')) map.removeLayer('aetherix-processed-raster');
-      if (map.getSource('aetherix-processed-raster')) map.removeSource('aetherix-processed-raster');
+      if (map.getLayer('aetherix-processed-raster') && typeof map.removeLayer === 'function') map.removeLayer('aetherix-processed-raster');
+      if (map.getSource('aetherix-processed-raster') && typeof map.removeSource === 'function') map.removeSource('aetherix-processed-raster');
+
+      // These tile rasters are inserted below the GeoJSON perimeter and watershed layers.
+      syncRasterTiles('aetherix-sar-underlay', underlayLayers, showSatellite, 0.52);
+      syncRasterTiles('aetherix-terrain-hillshade', terrainLayers, showTerrain, 0.58, true);
+
       if (activeRaster) {
         map.addSource('aetherix-processed-raster', {
           type: 'raster',
-          tiles: [aetherixApi.tileTemplate(activeRaster, rasterBandsRef.current)],
+          tiles: [aetherixApi.tileTemplate(activeRaster, rasterBandsRef.current, { baseUrl: tileApiBase })],
           tileSize: 256,
           attribution: 'AETHERIX processed 20 m raster data',
         });
@@ -126,12 +164,14 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
           id: 'fire-perimeters-casing',
           type: 'line',
           source: 'fire-perimeters',
+          layout: { visibility: showFires ? 'visible' : 'none' },
           paint: { 'line-color': '#07131A', 'line-width': 4.5, 'line-opacity': 0.78 },
         });
         map.addLayer({
           id: 'fire-perimeters-line',
           type: 'line',
           source: 'fire-perimeters',
+          layout: { visibility: showFires ? 'visible' : 'none' },
           paint: {
             'line-color': '#F8FAFC',
             'line-width': 2.2,
@@ -198,22 +238,31 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
           id: 'huc12-watersheds-fill',
           type: 'fill',
           source: 'huc12-watersheds',
+          layout: { visibility: showWatersheds ? 'visible' : 'none' },
           paint: {
             'fill-color': MAP_THEME.watersheds.default.outline,
-            'fill-opacity': 0.07,
+            'fill-opacity': 0.035,
           },
         });
 
-        // Watershed dashed boundaries
+        map.addLayer({
+          id: 'huc12-watersheds-casing',
+          type: 'line',
+          source: 'huc12-watersheds',
+          layout: { visibility: showWatersheds ? 'visible' : 'none' },
+          paint: { 'line-color': '#07131A', 'line-width': 3.2, 'line-opacity': 0.78 },
+        });
+
+        // Clear solid HUC-12 boundaries remain visible over imagery and raster underlays.
         map.addLayer({
           id: 'huc12-watersheds-line',
           type: 'line',
           source: 'huc12-watersheds',
+          layout: { visibility: showWatersheds ? 'visible' : 'none' },
           paint: {
             'line-color': MAP_THEME.watersheds.default.outline,
-            'line-width': 1.5,
-            'line-dasharray': [2, 2],
-            'line-opacity': 0.85,
+            'line-width': 1.8,
+            'line-opacity': 0.95,
           },
         });
 
@@ -240,7 +289,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
     } finally {
       setLoading(false);
     }
-  }, [interactive, onSelectFire, onSelectWatershed]);
+  }, [interactive, onSelectFire, onSelectWatershed, showFires, showWatersheds, showSatellite, showTerrain, terrainLayers, underlayLayers, tileApiBase]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -275,17 +324,19 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
       const handleAddVectors = () => {
         addVectorLayers(map);
       };
+      const handleStyleReload = () => {
+        if (map.isStyleLoaded() && !map.getSource('fire-perimeters')) addVectorLayers(map);
+      };
 
       map.on('load', handleAddVectors);
-      map.on('styledata', () => {
-        if (map.isStyleLoaded()) {
-          addVectorLayers(map);
-        }
-      });
+      map.on('styledata', handleStyleReload);
 
       return () => {
-        map.off('load', handleAddVectors);
-        map.remove();
+        if (typeof map.off === 'function') {
+          map.off('load', handleAddVectors);
+          map.off('styledata', handleStyleReload);
+        }
+        if (typeof map.remove === 'function') map.remove();
         mapRef.current = null;
       };
     } catch (err) {
@@ -396,6 +447,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
     if (map.getLayer('huc12-watersheds-line')) {
       map.setLayoutProperty('huc12-watersheds-line', 'visibility', showWatersheds ? 'visible' : 'none');
       map.setLayoutProperty('huc12-watersheds-fill', 'visibility', showWatersheds ? 'visible' : 'none');
+      map.setLayoutProperty('huc12-watersheds-casing', 'visibility', showWatersheds ? 'visible' : 'none');
     }
   }, [showFires, showWatersheds]);
 

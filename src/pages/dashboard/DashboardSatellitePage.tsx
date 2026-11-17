@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { ComparisonSlider } from '@/components/maps/ComparisonSlider';
 import { InteractiveMap } from '@/components/maps/InteractiveMap';
 import { aetherixApi, FireSummary, RasterLayer } from '@/services/aetherixApi';
@@ -63,6 +63,23 @@ export const DashboardSatellitePage: React.FC = () => {
     const phase = radarLayer === 'pre-sar' ? 'pre' : radarLayer === 'during-sar' ? 'during' : 'post';
     return processedLayers.find((layer) => layer.path.endsWith(`/nisar/composites/${polarization}_${phase}_20m_dB.tif`)) || null;
   };
+  const radarRaster = useMemo(() => {
+    const source = getRaster('radar');
+    if (!source || source.fire !== fireId) return null;
+
+    const isChange = source.path.includes('/nisar/changes/');
+    const isCount = source.path.includes('/nisar/observation_counts/');
+    const minimum = isChange ? (polarization === 'HH' ? -7 : -9) : isCount ? 0 : polarization === 'HH' ? -16 : -22;
+    const maximum = isChange ? (polarization === 'HH' ? 7 : 9) : isCount ? 5 : polarization === 'HH' ? -1 : -6;
+    const palette = isChange ? 'RdBu_r' : 'viridis';
+    const query = new URLSearchParams({ minimum: String(minimum), maximum: String(maximum), palette });
+
+    return {
+      ...source,
+      tile_url: `${source.tile_url}?${query.toString()}`,
+      visualization: { ...source.visualization, min: minimum, max: maximum, palette },
+    };
+  }, [processedLayers, radarLayer, polarization, fireId]);
   const selectedOpticalBands = opticalLayer === 'false' ? [4, 3, 2] : opticalLayer === 'natural' ? [3, 2, 1] : undefined;
   const phaseSummary = (source: string, layer: string, phase: string) => phaseObservations.find((row) => row.source === source && row.layer === layer && row.phase === phase);
   const beforeNBR = processedLayers.find((layer) => layer.path.endsWith('/sentinel2/bands/pre/NBR.tif'));
@@ -416,12 +433,27 @@ export const DashboardSatellitePage: React.FC = () => {
               </div>
 
               {/* Map Canvas */}
-              <InteractiveMap height="380px" selectedFireId={fireId} rasterLayer={getRaster('radar')} showFires={true} showWatersheds={true} />
+              <InteractiveMap height="380px" selectedFireId={fireId} rasterLayer={radarRaster} showFires={true} showWatersheds={true} />
 
               <div className="flex items-center justify-between text-xs font-mono text-[#858B95] dark:text-[#788796] pt-1">
-                <span>{getRaster('radar')?.name || 'NISAR backscatter'} · gamma-zero dB</span>
-                <span>{getRaster('radar')?.units === 'count' ? `Observation counts · display ${getRaster('radar')?.visualization.min ?? '—'}–${getRaster('radar')?.visualization.max ?? '—'}` : `Provisional NISAR · display ${getRaster('radar')?.visualization.min ?? '—'}–${getRaster('radar')?.visualization.max ?? '—'} dB`}</span>
+                <span>{radarRaster?.name || 'NISAR backscatter'} &middot; {radarRaster?.units === 'count' ? 'observation count' : 'gamma-zero backscatter'}</span>
+                <span>EPSG:32610 &middot; 20 m &middot; {radarRaster?.units === 'count' ? 'count' : 'dB'}</span>
               </div>
+              {radarRaster && (
+                <div className="space-y-1.5" aria-label={`${radarRaster.units === 'count' ? 'Observation count' : radarRaster.path.includes('/changes/') ? 'Backscatter change' : 'Backscatter'} legend`}>
+                  <div
+                    className="h-2 rounded-full border border-black/10 dark:border-white/10"
+                    style={{ background: radarRaster.path.includes('/changes/')
+                      ? 'linear-gradient(90deg, #313695 0%, #74add1 25%, #f7f7f7 50%, #f46d43 75%, #a50026 100%)'
+                      : 'linear-gradient(90deg, #440154 0%, #3b528b 25%, #21918c 50%, #5ec962 75%, #fde725 100%)' }}
+                  />
+                  <div className="flex justify-between text-[10px] font-mono text-[#858B95] dark:text-[#788796]">
+                    <span>{radarRaster.visualization.min} {radarRaster.units}</span>
+                    <span>{radarRaster.path.includes('/changes/') ? 'decrease to 0 to increase' : radarRaster.units === 'count' ? 'fewer to more observations' : 'lower to higher backscatter'}</span>
+                    <span>{radarRaster.visualization.max} {radarRaster.units}</span>
+                  </div>
+                </div>
+              )}
             </div>}
           </div>
 

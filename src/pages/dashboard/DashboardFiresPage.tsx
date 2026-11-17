@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { InteractiveMap } from '@/components/maps/InteractiveMap';
 import { aetherixApi, FireSummary, RasterLayer } from '@/services/aetherixApi';
 import {
@@ -7,16 +7,39 @@ import {
   CheckCircle,
 } from 'lucide-react';
 
+async function loadLocalLayers(fire: 'timber' | 'plaskett'): Promise<RasterLayer[]> {
+  const response = await fetch(`/api/layers?fire=${fire}`);
+  if (!response.ok) throw new Error(`AETHERIX API ${response.status}: /api/layers?fire=${fire}`);
+  const data = await response.json() as { layers: RasterLayer[] };
+  return data.layers;
+}
+
+function formatProjectDate(value?: string): string {
+  if (!value) return 'Date unavailable';
+  const date = new Date(`${value.slice(0, 10)}T00:00:00Z`);
+  if (Number.isNaN(date.getTime())) return 'Date unavailable';
+  return new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }).format(date);
+}
+
 export const DashboardFiresPage: React.FC = () => {
   const [selectedFire, setSelectedFire] = useState<'timber' | 'plaskett' | 'all'>('all');
   const [showWatersheds, setShowWatersheds] = useState<boolean>(true);
   const [showTerrain, setShowTerrain] = useState<boolean>(true);
   const [showSatelliteUnderlay, setShowSatelliteUnderlay] = useState<boolean>(false);
   const [availableLayers, setAvailableLayers] = useState<RasterLayer[]>([]);
+  const [overlayLayers, setOverlayLayers] = useState<RasterLayer[]>([]);
   const [activeLayerId, setActiveLayerId] = useState('');
   const [rasterOpacity, setRasterOpacity] = useState(0.78);
   const [summaries, setSummaries] = useState<Partial<Record<'timber' | 'plaskett', FireSummary>>>({});
   const [dataError, setDataError] = useState('');
+
+  useEffect(() => {
+    let alive = true;
+    Promise.all([loadLocalLayers('timber'), loadLocalLayers('plaskett')])
+      .then((fireLayers) => alive && setOverlayLayers(fireLayers.flat()))
+      .catch((error: Error) => alive && setDataError(`Map overlays unavailable: ${error.message}`));
+    return () => { alive = false; };
+  }, []);
 
   useEffect(() => {
     let alive = true;
@@ -33,11 +56,11 @@ export const DashboardFiresPage: React.FC = () => {
       setActiveLayerId('');
       return;
     }
-    Promise.all([aetherixApi.layers(selectedFire), aetherixApi.summary(selectedFire)])
+    Promise.all([loadLocalLayers(selectedFire), aetherixApi.summary(selectedFire)])
       .then(([layerResponse, summary]) => {
         if (!alive) return;
-        setAvailableLayers(layerResponse.layers);
-        setActiveLayerId((current) => current && layerResponse.layers.some((layer) => layer.id === current) ? current : '');
+        setAvailableLayers(layerResponse);
+        setActiveLayerId((current) => current && layerResponse.some((layer) => layer.id === current) ? current : '');
         setSummaries((current) => ({ ...current, [selectedFire]: summary }));
         setDataError('');
       })
@@ -47,6 +70,9 @@ export const DashboardFiresPage: React.FC = () => {
 
   const selectedSummary = selectedFire === 'all' ? null : summaries[selectedFire];
   const activeRaster = availableLayers.find((layer) => layer.id === activeLayerId) || null;
+  const selectedOverlayLayers = useMemo(() => overlayLayers.filter((layer) => selectedFire === 'all' || layer.fire === selectedFire), [overlayLayers, selectedFire]);
+  const terrainLayers = useMemo(() => selectedOverlayLayers.filter((layer) => layer.path.endsWith('/terrain/elevation_20m.tif')), [selectedOverlayLayers]);
+  const sarUnderlayLayers = useMemo(() => selectedOverlayLayers.filter((layer) => layer.path.endsWith('/nisar/composites/HV_post_20m_dB.tif')), [selectedOverlayLayers]);
 
   return (
     <div className="w-full px-4 sm:px-6 lg:px-8 py-8 max-w-7xl mx-auto space-y-6">
@@ -171,7 +197,11 @@ export const DashboardFiresPage: React.FC = () => {
         height="560px"
         selectedFireId={selectedFire}
         showWatersheds={showWatersheds}
+        showTerrain={showTerrain}
         showSatellite={showSatelliteUnderlay}
+        terrainLayers={terrainLayers}
+        underlayLayers={sarUnderlayLayers}
+        tileApiBase=""
         onSelectFire={(id) => setSelectedFire(id)}
         rasterLayer={activeRaster}
         rasterOpacity={rasterOpacity}
@@ -212,8 +242,8 @@ export const DashboardFiresPage: React.FC = () => {
 
             <div className="grid grid-cols-2 gap-4 text-xs font-mono">
               <div>
-                <span className="text-gray-400 dark:text-[#788796] block text-[10px]">Ignition Date</span>
-                <span className="text-gray-800 dark:text-[#F3F6F8] font-medium">{summaries.timber?.ignition_date || 'Loading processing summary'}</span>
+                <span className="text-gray-400 dark:text-[#788796] block text-[10px]">Timber Fire ignition / event date</span>
+                <span className="text-gray-800 dark:text-[#F3F6F8] font-medium">{summaries.timber ? formatProjectDate(summaries.timber.ignition_date) : 'Loading processing summary'}</span>
               </div>
               <div>
                   <span className="text-gray-400 dark:text-[#788796] block text-[10px]">Valid data coverage</span>
@@ -230,7 +260,7 @@ export const DashboardFiresPage: React.FC = () => {
             </div>
 
             <div className="space-y-1.5 pt-2">
-              <span className="text-xs font-mono uppercase text-gray-400 dark:text-[#788796]">Processed dNBR statistics · not field-calibrated severity</span>
+              <span className="text-xs font-mono uppercase text-gray-400 dark:text-[#788796]">Processed dNBR statistics – not field-calibrated severity.</span>
               <div className="w-full h-3 rounded-full overflow-hidden flex bg-gray-100 dark:bg-gray-800">
                 <div className="h-full bg-[#F28C45]" style={{ width: `${summaries.timber ? Math.max(0, Math.min(100, summaries.timber.common_valid_score_percent)) : 0}%` }} title="Common valid data coverage" />
               </div>
@@ -265,8 +295,8 @@ export const DashboardFiresPage: React.FC = () => {
 
             <div className="grid grid-cols-2 gap-4 text-xs font-mono">
               <div>
-                <span className="text-gray-400 dark:text-[#788796] block text-[10px]">Ignition Date</span>
-                <span className="text-gray-800 dark:text-[#F3F6F8] font-medium">{summaries.plaskett?.ignition_date || 'Loading processing summary'}</span>
+                <span className="text-gray-400 dark:text-[#788796] block text-[10px]">Plaskett Fire ignition / event date</span>
+                <span className="text-gray-800 dark:text-[#F3F6F8] font-medium">{summaries.plaskett ? formatProjectDate(summaries.plaskett.ignition_date) : 'Loading processing summary'}</span>
               </div>
               <div>
                   <span className="text-gray-400 dark:text-[#788796] block text-[10px]">Valid data coverage</span>
@@ -283,7 +313,7 @@ export const DashboardFiresPage: React.FC = () => {
             </div>
 
             <div className="space-y-1.5 pt-2">
-              <span className="text-xs font-mono uppercase text-gray-400 dark:text-[#788796]">Processed dNBR statistics · not field-calibrated severity</span>
+              <span className="text-xs font-mono uppercase text-gray-400 dark:text-[#788796]">Processed dNBR statistics – not field-calibrated severity.</span>
               <div className="w-full h-3 rounded-full overflow-hidden flex bg-gray-100 dark:bg-gray-800">
                 <div className="h-full bg-[#F06468]" style={{ width: `${summaries.plaskett ? Math.max(0, Math.min(100, summaries.plaskett.common_valid_score_percent)) : 0}%` }} title="Common valid data coverage" />
               </div>
@@ -317,7 +347,7 @@ export const DashboardFiresPage: React.FC = () => {
                     {selectedSummary.name} Processed Data Summary
                   </h2>
                   <div className="text-xs font-mono text-[#626873] dark:text-[#AAB5C2]">
-                    Processing ignition reference: {selectedSummary.ignition_date} · 20 m analysis grid, {selectedSummary.crs}
+                    Fire ignition event: {formatProjectDate(selectedSummary.ignition_date)} · 20 m analysis grid, {selectedSummary.crs}
                   </div>
                 </div>
               </div>
@@ -409,7 +439,7 @@ export const DashboardFiresPage: React.FC = () => {
             <span className="px-3 py-1 bg-white dark:bg-[#111C28] rounded-full text-[#18191D] dark:text-[#F3F6F8] shadow-2xs font-semibold">
               PRE / DURING / POST COMPOSITES
             </span>
-              <span className="text-gray-500 dark:text-[#AAB5C2] px-2 font-medium">DATES AND PASS COUNTS NOT PROVIDED</span>
+              <span className="text-gray-500 dark:text-[#AAB5C2] px-2 font-medium">EVENT DATES &middot; ANALYZED IMAGE DATES</span>
           </div>
         </div>
 
@@ -424,24 +454,23 @@ export const DashboardFiresPage: React.FC = () => {
                 </div>
                 <div>
                   <span className="text-[10px] font-mono uppercase text-gray-400 dark:text-[#788796] block">
-                    PRE-FIRE PHASE
+                    PRE-FIRE REFERENCE
                   </span>
-                  <h4 className="font-bold text-sm text-[#18191D] dark:text-[#F3F6F8]">Pre-Fire Period</h4>
+                  <h4 className="font-bold text-sm text-[#18191D] dark:text-[#F3F6F8]">Common Baseline</h4>
                 </div>
               </div>
 
               <div className="text-xs font-mono font-bold text-[#18191D] dark:text-[#36C5D9]">
-                Pre-fire composite; date not supplied
+                Sentinel-2 baseline: 17 July 2026
               </div>
 
               <p className="text-xs text-[#626873] dark:text-[#AAB5C2] leading-relaxed">
-                Sentinel-2 pre-fire layers provide a reference for comparing vegetation and burn-index values with later phases. The package does not list acquisition dates or scene totals.
+                Common pre-fire reference date used for the analyzed Sentinel-2 imagery.
               </p>
             </div>
 
             <div className="pt-3 border-t border-gray-200/60 dark:border-gray-800 text-[11px] font-mono text-gray-500 dark:text-[#788796] flex justify-between">
-              <span>Sentinel-2 MSI</span>
-              <span className="text-emerald-600 dark:text-[#43C99A] font-semibold">Pre-fire phase data</span>
+              <span className="text-emerald-600 dark:text-[#43C99A] font-semibold">Sentinel-2 MSI &middot; 17 July 2026</span>
             </div>
           </div>
 
@@ -454,24 +483,23 @@ export const DashboardFiresPage: React.FC = () => {
                 </div>
                 <div>
                   <span className="text-[10px] font-mono uppercase text-gray-400 dark:text-[#788796] block">
-                    DURING-FIRE PHASE
+                    IGNITION / DURING-FIRE
                   </span>
-                  <h4 className="font-bold text-sm text-[#18191D] dark:text-[#F3F6F8]">Fire Period</h4>
+                  <h4 className="font-bold text-sm text-[#18191D] dark:text-[#F3F6F8]">Fire Event Dates</h4>
                 </div>
               </div>
 
               <div className="text-xs font-mono font-bold text-[#F28C45]">
-              During-fire phase; date not supplied
+              Timber: {summaries.timber ? formatProjectDate(summaries.timber.ignition_date) : '8 August 2026'} &middot; Plaskett: {summaries.plaskett ? formatProjectDate(summaries.plaskett.ignition_date) : '26 August 2026'}
               </div>
 
               <p className="text-xs text-[#626873] dark:text-[#AAB5C2] leading-relaxed">
-                The supplied optical and provisional radar summaries include a during-fire phase. These aggregates do not provide a dated fire-progression track.
+                Supplied ignition dates for the two separate wildfire events. These are event dates, not satellite acquisition dates.
               </p>
             </div>
 
             <div className="pt-3 border-t border-gray-200/60 dark:border-gray-800 text-[11px] font-mono text-gray-500 dark:text-[#788796] flex justify-between">
-              <span>NISAR SAR (L-Band)</span>
-              <span className="text-[#F28C45] font-semibold">Phase summary available</span>
+              <span className="text-[#F28C45] font-semibold">Timber &amp; Plaskett &middot; Fire event dates</span>
             </div>
           </div>
 
@@ -484,24 +512,23 @@ export const DashboardFiresPage: React.FC = () => {
                 </div>
                 <div>
                   <span className="text-[10px] font-mono uppercase text-gray-400 dark:text-[#788796] block">
-                    POST-FIRE RADIOMETRY
+                    POST-FIRE OBSERVATIONS
                   </span>
-                  <h4 className="font-bold text-sm text-[#18191D] dark:text-[#F3F6F8]">Post-Fire Period</h4>
+                  <h4 className="font-bold text-sm text-[#18191D] dark:text-[#F3F6F8]">Analyzed Satellite Acquisitions</h4>
                 </div>
               </div>
 
               <div className="text-xs font-mono font-bold text-[#18191D] dark:text-[#6599E8]">
-                Post-fire phase; date not supplied
+                Timber: 10 &amp; 22 August 2026 &middot; Plaskett: 3 September 2026
               </div>
 
               <p className="text-xs text-[#626873] dark:text-[#AAB5C2] leading-relaxed">
-                The post-fire layers support optical and radar change comparisons. dNBR is a spectral indicator and has not been calibrated here against field severity measurements.
+                NISAR acquisitions used in the current analysis. Additional candidate dates remain provisional and are excluded from validated observations.
               </p>
             </div>
 
             <div className="pt-3 border-t border-gray-200/60 dark:border-gray-800 text-[11px] font-mono text-gray-500 dark:text-[#788796] flex justify-between">
-              <span>S2 + NISAR Fusion</span>
-              <span className="text-[#6599E8] font-semibold">Post-fire phase data</span>
+              <span className="text-[#6599E8] font-semibold">NISAR GCOV &middot; HH/HV &middot; Analyzed acquisitions</span>
             </div>
           </div>
         </div>

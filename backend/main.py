@@ -187,6 +187,24 @@ def rgba_scalar(values: np.ndarray, valid: np.ndarray, minimum: float, maximum: 
     return arr
 
 
+def rgba_hillshade(elevation: np.ndarray, valid: np.ndarray, pixel_size_m: float) -> np.ndarray:
+    if not valid.any():
+        return np.zeros((*elevation.shape, 4), dtype=np.uint8)
+    fill_value = float(np.nanmedian(elevation[valid]))
+    surface = np.where(valid, elevation, fill_value)
+    dz_dy, dz_dx = np.gradient(surface, pixel_size_m, pixel_size_m)
+    slope = np.arctan(np.hypot(dz_dx, dz_dy))
+    aspect = np.arctan2(-dz_dy, dz_dx)
+    altitude = np.deg2rad(45.0)
+    azimuth = np.deg2rad(315.0)
+    illumination = np.sin(altitude) * np.cos(slope) + np.cos(altitude) * np.sin(slope) * np.cos(azimuth - aspect)
+    gray = np.clip((illumination + 1.0) * 0.5, 0.12, 0.95)
+    rgba = np.zeros((*elevation.shape, 4), dtype=np.uint8)
+    rgba[:, :, :3] = (gray[:, :, None] * 255).astype(np.uint8)
+    rgba[:, :, 3] = valid.astype(np.uint8) * 190
+    return rgba
+
+
 @app.get("/healthz")
 def health() -> dict[str, Any]:
     return {"status": "ok", "data_root": str(DATA_ROOT), "data_available": (DATA_ROOT / "layer_manifest.json").is_file()}
@@ -249,7 +267,8 @@ def tile_pixels(path: Path, z: int, x: int, y: int, indexes: list[int]) -> list[
 
 @app.get("/api/tiles/{fire}/{layer_id}/{z}/{x}/{y}.png")
 def tile(fire: str, layer_id: str, z: int, x: int, y: int, bands: str | None=None,
-         minimum: float | None=None, maximum: float | None=None, palette: str | None=None) -> Response:
+         minimum: float | None=None, maximum: float | None=None, palette: str | None=None,
+         hillshade: bool=False) -> Response:
     item,path=resolve_raster(fire,layer_id)
     if z<0 or z>22 or x<0 or y<0 or x>=2**z or y>=2**z:
         raise HTTPException(400,detail="Invalid Web Mercator tile coordinates.")
@@ -261,6 +280,14 @@ def tile(fire: str, layer_id: str, z: int, x: int, y: int, bands: str | None=Non
         raise HTTPException(400,detail=f"Select one band or three RGB bands from 1 to {count}.")
     channels=tile_pixels(path,z,x,y,indexes)
     valid=np.logical_and.reduce([np.isfinite(a) for a in channels])
+    if hillshade:
+        if len(channels) != 1:
+            raise HTTPException(400, detail="Hillshade rendering requires a single-band elevation raster.")
+        extent = 20037508.342789244
+        tile_resolution = (2 * extent) / (2**z * 256)
+        center_latitude = np.arctan(np.sinh(np.pi * (1 - 2 * (y + 0.5) / (2**z))))
+        ground_pixel_size = tile_resolution * max(np.cos(center_latitude), 0.01)
+        return response_png(rgba_hillshade(channels[0], valid, ground_pixel_size))
     if len(channels)==3:
         low=minimum if minimum is not None else 0.0
         high=maximum if maximum is not None else 0.3
